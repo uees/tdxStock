@@ -1,6 +1,49 @@
-### Django ###
-*.log
-*.pot
-*.pyc
+# Byte-compiled / optimized / DLL files
 __pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+
+# Windows:
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
 local_settings.py
+
+# My configurations:
