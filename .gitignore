@@ -47,3 +47,7 @@ Desktop.ini
 local_settings.py
 
 # My configurations:
+.idea/
+*.sqlite3
+*.db
+.env
