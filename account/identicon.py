@@ -1,14 +1,12 @@
 # For digest operations.
+# For decoding hex values (works both for Python 2.7.x and Python 3.x).
+import binascii
 import hashlib
-
 # For saving the images from Pillow.
 from io import BytesIO
 
 # Pillow for Image processing.
 from PIL import Image, ImageDraw
-
-# For decoding hex values (works both for Python 2.7.x and Python 3.x).
-import binascii
 
 
 class Generator(object):

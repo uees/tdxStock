@@ -1,4 +1,3 @@
-import json
 from django.db import models
 
 from tdxStock.fields import JSONField

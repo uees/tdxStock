@@ -11,7 +11,6 @@ class Command(BaseCommand):
             Option.objects.create(name="site_name", value='TdxStock')
             Option.objects.create(name="site_host", value='localhost')
             Option.objects.create(name="site_description", value='沪深股票分析')
-            Option.objects.create(name="test", value={'a': 1, 'b': None, 'c': 'abc'})
             options = [Option(name=name, value=None) for name in ['site_seo_description', 'site_keywords',
                                                                   'open_site_comment', 'beian_code',
                                                                   'gongan_beian_code', 'show_gongan_code']]

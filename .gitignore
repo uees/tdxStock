@@ -45,9 +45,12 @@ Desktop.ini
 # Django stuff:
 *.log
 local_settings.py
+makemigrations/*
+!makemigrations/__init__.py
 
 # My configurations:
 .idea/
 *.sqlite3
 *.db
 .env
+.vscode

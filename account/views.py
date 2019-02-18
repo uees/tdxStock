@@ -1,20 +1,18 @@
-from django.shortcuts import render
-from .forms import RegisterForm, LoginForm
-from django.contrib.auth import logout
 from django.conf import settings
-from django.views.generic import FormView, RedirectView
-from django.contrib.auth import get_user_model
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.views.decorators.csrf import csrf_protect
 from django.contrib import auth
-from django.views.decorators.cache import never_cache
-from django.shortcuts import redirect
+from django.contrib.auth import REDIRECT_FIELD_NAME, get_user_model, logout
+from django.contrib.auth.forms import AuthenticationForm
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.views.decorators.debug import sensitive_post_parameters
 from django.utils.http import is_safe_url
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.generic import FormView, RedirectView
+
+from .forms import LoginForm, RegisterForm
 
 
 class RegisterView(FormView):
