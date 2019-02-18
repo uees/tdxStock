@@ -5,6 +5,7 @@ class Stock(models.Model):
     """股票"""
     name = models.CharField(max_length=64)
     code = models.CharField(max_length=32)
+    exchange_code = models.CharField(max_length=32)  # 交易市场, 例如，XSHG-上海证券交易所；XSHE-深圳证券交易所
     company_name = models.CharField(max_length=200)  # 公司名称
     former_name = models.CharField(max_length=200)  # 曾用名
     actual_controller = models.CharField(max_length=200)  # 实际控制人
