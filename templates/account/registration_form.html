@@ -1,0 +1,27 @@
+{% extends '_layout/base_account.html' %}
+{% load static %}
+{% block content %}
+    <div class="container text-center">
+
+        <h2 class="form-signin-heading text-center">注册一个账号</h2>
+
+        <img class="mb-4 img-circle" src="{% static 'img/logo.png' %}" alt="" width="72"
+             height="72">
+        <form class="form-signin" action="{% url 'account:register' %}" method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% for field in form %}
+                {{ field }}
+                {{ field.errors }}
+            {% endfor %}
+
+            <button class="btn btn-lg btn-primary btn-block" type="submit">注册</button>
+
+        </form>
+
+        <p class="text-center">
+            <a href="{% url "account:login" %}">登录</a>
+        </p>
+
+    </div> <!-- /container -->
+{% endblock %}

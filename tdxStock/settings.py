@@ -10,14 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
+import os
 import environ
 
-root = environ.Path(__file__) - 2  # two folder back (/a/b/c/ - 2 = /a/)
-env = environ.Env(DEBUG=(bool, False), )
-env.read_env(root('.env'))  # reading .env file
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = root()
+# BASE_DIR = root()
+BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+
+env = environ.Env(DEBUG=(bool, False), )
+env.read_env(os.path.join(BASE_DIR, '.env'))  # reading .env file
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -73,7 +74,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            root('templates'),
+            os.path.join(BASE_DIR, 'templates')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -96,7 +97,9 @@ WSGI_APPLICATION = 'tdxStock.wsgi.application'
 
 DATABASES = {
     'default': env.db(),  # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
-    'extra': env.db('SQLITE_URL', default=root('db.sqlite3'), engine='django.db.backends.sqlite3'),
+    'extra': env.db('SQLITE_URL',
+                    default=os.path.join(BASE_DIR, 'db.sqlite3'),
+                    engine='django.db.backends.sqlite3'),
 }
 
 # Password validation
@@ -132,15 +135,15 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
-public_root = root.path('public/')
+PUBLIC_ROOT = os.path.join(BASE_DIR, 'public')
 
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    public_root('static'),
+    os.path.join(PUBLIC_ROOT, 'static'),
 ]
 
-MEDIA_ROOT = public_root('media')
+MEDIA_ROOT = os.path.join(PUBLIC_ROOT, 'media')
 MEDIA_URL = '/media/'
 
 # 允许使用用户名或密码登录
