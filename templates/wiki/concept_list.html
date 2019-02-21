@@ -1,0 +1,47 @@
+{% extends '_layout/base.html' %}
+{% load static %}
+{% block title %}首页{% endblock %}
+{% block content %}
+    <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-purple rounded box-shadow">
+        <img class="mr-3" src="{% static 'img/logo.png' %}" alt="" width="48" height="48">
+        <div class="lh-100">
+            <h6 class="mb-0 text-white lh-100">{{ SITE_NAME }}</h6>
+            <small>Since 2019</small>
+        </div>
+    </div>
+    <div class="my-3 p-3 bg-white rounded box-shadow">
+        <h6 class="border-bottom border-gray pb-2 mb-0">概念</h6>
+        {% for concept in concept_list %}
+            <div class="media text-muted pt-3">
+                <img data-src="holder.js/32x32?theme=thumb&bg=007bff&fg=007bff&size=1" alt="" class="mr-2 rounded">
+                <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                    <strong class="d-block text-gray-dark">{{ concept.name }}</strong>
+                    {{ concept.description | truncatechars_html:200 }}
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                {% if concept_list.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ concept_list.previous_page_number }}">
+                            <span class="meta-nav">&laquo;</span> Previous
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% if concept_list.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ concept_list.next_page_number }}">
+                            Next <span class="meta-nav">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+
+{% endblock %}

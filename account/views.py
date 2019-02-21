@@ -22,17 +22,12 @@ class RegisterView(FormView):
 
 
 class LogoutView(views.LogoutView):
-    next_page = settings.LOGIN_URL
+    next_page = '/'
     template_name = 'account/logged_out.html'
 
 
 class LoginView(views.LoginView):
     form_class = LoginForm
     template_name = 'account/login.html'
+    redirect_authenticated_user = True
     success_url = '/'
-
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect(self.success_url)
-
-        return super(LoginView, self).get(request, *args, **kwargs)
