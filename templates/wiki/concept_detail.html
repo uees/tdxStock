@@ -1,10 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends '_layout/base.html' %}
+{% load static %}
+{% block title %}{{ object.name }}{% endblock %}
 
-</body>
-</html>
+{% block header_css %}
+    <link href="{% static 'css/markdown.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="card" style="margin-top: 60px">
+        <div class="card-header">
+            {{ object.name }}
+        </div>
+        <div class="card-body">
+            {{ object.description_html|safe }}
+        </div>
+    </div>
+{% endblock %}

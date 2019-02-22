@@ -13,11 +13,21 @@
         <h6 class="border-bottom border-gray pb-2 mb-0">概念</h6>
         {% for concept in concept_list %}
             <div class="media text-muted pt-3">
-                <img data-src="holder.js/32x32?theme=thumb&bg=007bff&fg=007bff&size=1" alt="" class="mr-2 rounded">
-                <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-                    <strong class="d-block text-gray-dark">{{ concept.name }}</strong>
-                    {{ concept.description | truncatechars_html:200 }}
-                </p>
+                <img data-src="holder.js/48x48?theme=thumb&bg=007bff&fg=007bff&size=1" alt="" class="mr-2 rounded">
+                <div class="media-body border-bottom border-gray">
+                    <h5 class="mt-0" style="width: 100%">
+                        <a href="{% url 'wiki:concept-detail' concept.id %}">
+                            {{ concept.name }}
+                        </a>
+                        <span style="float: right" class="pb-3 mb-0 small lh-100">
+                            <a href="{% url 'wiki:concept-edit' concept.pk %}">编辑</a> |
+                            <a href="{% url 'wiki:concept-delete' concept.pk %}">删除</a>
+                        </span>
+                    </h5>
+                    <div class="pb-3 mb-0 small lh-125">
+                        {{ concept.description | truncatechars_html:200 }}
+                    </div>
+                </div>
             </div>
         {% endfor %}
     </div>

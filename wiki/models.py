@@ -7,7 +7,8 @@ from tdxStock.abstract_models import Timestamp
 class Concept(Timestamp):
     """名词解释"""
     name = models.CharField("名称", max_length=200, unique=True)
-    description = models.TextField("描述")
+    description = models.TextField("描述(Markdown)", null=True, blank=True)
+    description_html = models.TextField("描述(HTML)", null=True, editable=False)
 
     class Meta:
         ordering = ['-updated_at']

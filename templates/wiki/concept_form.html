@@ -1,7 +1,7 @@
 {% extends '_layout/base.html' %}
 {% load static %}
 
-{% block title %}创建概念{% endblock %}
+{% block title %}{% if object %}编辑{% else %}创建{% endif %}概念{% endblock %}
 
 {% block header_css %}
     <link rel="stylesheet" href="{% static 'css/editormd.min.css' %}"/>
@@ -14,7 +14,7 @@
             var editor = editormd("editormd", {
                 path: "/static/js/lib/",
                 height: 640,
-                saveHTMLToTextarea : true,
+                saveHTMLToTextarea: true,
             });
         });
     </script>
@@ -22,7 +22,7 @@
 
 {% block content %}
     <div class="py-5">
-        <h2>创建概念</h2>
+        <h2>{% if object %}编辑{% else %}创建{% endif %}概念</h2>
     </div>
 
     <form method="post">
@@ -32,21 +32,21 @@
         <div class="mb-3">
             {{ form.name.errors }}
             <label for="name">{{ form.name.label }}</label>
-            <input name="name" type="text" class="form-control" id="name" placeholder="{{ form.name.label }}" required>
+            <input name="name" type="text" class="form-control" id="name" placeholder="{{ form.name.label }}" required value="{% if object %}{{ object.name }}{% endif %}">
         </div>
 
         <div class="mb-3">
             {{ form.description.errors }}
             <label for="description">{{ form.name.description }}</label>
             <div id="editormd">
-                <textarea id="description" name="description" class="editormd-markdown-textarea"></textarea>
+                <textarea id="description" name="description" class="editormd-markdown-textarea">{% if object %}{{ object.description }}{% endif %}</textarea>
                 <textarea name="description_html" class="editormd-html-textarea"></textarea>
             </div>
         </div>
 
         <hr class="mb-4">
 
-        <button class="btn btn-primary btn-lg btn-block" type="submit">创建</button>
+        <button class="btn btn-primary btn-lg btn-block" type="submit">提交</button>
     </form>
 
 {% endblock %}

@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic import CreateView, DetailView, ListView, DeleteView, UpdateView
 from django.conf import settings
 
 
@@ -24,20 +25,46 @@ class ConceptDetailView(DetailView):
         return context
 
 
-class ConceptStoreView(CreateView):
+class ConceptCreateView(LoginRequiredMixin, CreateView):
     form_class = ConceptForm
-    template_name = 'wiki/concept_create.html'
+    template_name = 'wiki/concept_form.html'
 
     def form_valid(self, form):
         # This method is called when valid form data has been POSTed.
         concept = form.save(False)
+        concept.description_html = self.request.POST.get('description_html')
         concept.created_at = timezone.now()
         concept.updated_at = concept.created_at
-        concept.save(True)
+        concept.save()
         return super().form_valid(form)
 
     def get_success_url(self):
         return reverse('wiki:concept-detail', kwargs={'pk': self.object.id})
+
+
+class ConceptUpdateView(LoginRequiredMixin, UpdateView):
+    form_class = ConceptForm
+    template_name = 'wiki/concept_form.html'
+    model = Concept
+
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        self.object.name = form.cleaned_data['name']
+        self.object.description = form.cleaned_data['description']
+        self.object.description_html = self.request.POST.get('description_html')
+        self.object.updated_at = timezone.now()
+        self.object.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('wiki:concept-detail', kwargs={'pk': self.object.id})
+
+
+def delete(request, concept_id):
+    concept = get_object_or_404(Concept, pk=concept_id)
+    concept.delete()
+
+    return redirect(reverse('wiki:concept-list'))
 
 
 class IndexView(ConceptListView):
