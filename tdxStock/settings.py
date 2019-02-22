@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'option',
     'account',
     'wiki',
+    'basedata',
 
     # Debug toolbar + extensions
     'debug_toolbar',

@@ -14,5 +14,8 @@
         <div class="card-body">
             {{ object.description_html|safe }}
         </div>
+        <div class="card-footer bg-transparent border-success">
+            <a href="{% url 'wiki:concept-edit' object.id %}" class="card-link">Edit</a>
+        </div>
     </div>
 {% endblock %}

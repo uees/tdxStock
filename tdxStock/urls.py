@@ -22,7 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('account.urls')),
     path('', include('wiki.urls')),
-    path('categories/', include('category.urls')),
 ]
 
 if settings.DEBUG:
