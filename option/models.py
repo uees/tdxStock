@@ -8,6 +8,10 @@ class Option(models.Model):
     value = JSONField('值', null=True, blank=True)
     enable = models.BooleanField(default=True)
 
+    class Meta:
+        verbose_name = '选项'
+        verbose_name_plural = verbose_name
+
     def __str__(self):
         return self.name
 

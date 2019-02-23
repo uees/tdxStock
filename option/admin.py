@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django_extensions.db.fields.json import JSONField
-from .models import Option
 from django.conf import settings
+
+from .models import Option
+from .widgets import JsonEditorWidget
 
 
 class OptionAdmin(admin.ModelAdmin):
@@ -13,6 +15,10 @@ class OptionAdmin(admin.ModelAdmin):
         ('值', {'fields': ['value']}),
         ('开关', {'fields': ['enable']}),
     ]
+
+    formfield_overrides = {
+        JSONField: {'widget': JsonEditorWidget}
+    }
 
 
 admin.site.register(Option, OptionAdmin)

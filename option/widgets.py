@@ -1,36 +1,32 @@
 import json
 
-from django.forms import Widget
-from django.utils.safestring import mark_safe
+from django.template import loader
+from django import forms
 
 
-class JsonEditorWidget(Widget):
-    """
-    在 django  admin 后台中使用  jsoneditor 处理 JSONField
-    """
+class JsonEditorWidget(forms.Textarea):
 
-    html_template = """
-    <div id='%(name)s_editor_holder' style='padding-left:170px'></div>
-    <textarea hidden readonly class="vLargeTextField" cols="40" id="id_%(name)s" name="%(name)s" rows="20">%(value)s</textarea>
-    <script type="text/javascript">
-        var element = document.getElementById('%(name)s_editor_holder');
-        var json_value = %(value)s;
-        var %(name)s_editor = new JSONEditor(element, {
-            onChange: function() {
-                var textarea = document.getElementById('id_%(name)s');
-                var json_changed = JSON.stringify(%(name)s_editor.get()['Object']);
-                textarea.value = json_changed;
-            }
-        });
-        %(name)s_editor.set({"Object": json_value})
-        %(name)s_editor.expandAll()
-    </script>
-    """
+    def __init__(self, *args, **kwargs):
+        self.template = kwargs.pop('template', 'widgets/json_editor.html')
+        super().__init__(*args, **kwargs)
 
     def render(self, name, value, attrs=None, renderer=None):
-        if isinstance(value, str):
-            value = json.loads(value)
+        template = loader.get_template(self.template)
+        context = self.get_context(name, value, attrs)
+        return template.render(context)
 
-        result = self.html_template % {'name': name, 'value': json.dumps(value)}
-
-        return mark_safe(result)
+    class Media:
+        css = {
+            "all": (
+                "codemirror/lib/codemirror.css",
+                "codemirror/addon/lint/lint.css",
+                "codemirror/theme/rubyblue.css",
+            )
+        }
+        js = (
+            'codemirror/lib/codemirror.js',
+            'codemirror/mode/javascript/javascript.js',
+            'codemirror/addon/lint/jsonlint.js',
+            "codemirror/addon/lint/lint.js",
+            "codemirror/addon/lint/json-lint.js"
+        )

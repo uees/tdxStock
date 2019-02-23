@@ -1,0 +1,35 @@
+<div class="json-editor">
+    <span id="help-{{ widget.name }}" class="has-error hidden"></span>
+    <div id="json-editor-{{ widget.name }}"></div>
+    <textarea id="json-data-{{ widget.name }}" name="{{ widget.name }}"{% include "widgets/attrs.html" %}
+              style="display: none">{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var editorEl = document.getElementById('json-editor-{{ widget.name }}');
+        var textareaEl = document.getElementById('json-data-{{ widget.name }}');
+
+        function parse(v) {
+            try {
+                JSON.parse(v)
+            } catch (e) {
+                v = JSON.stringify(v)
+            }
+            return v
+        }
+
+        var editor = CodeMirror(editorEl, {
+            lineNumbers: true,
+            mode: 'application/json',
+            gutters: ['CodeMirror-lint-markers'],
+            theme: 'rubyblue',
+            lint: true,
+            value: parse(textareaEl.value),
+        });
+
+        editor.on('change', function (cm) {
+            textareaEl.value = cm.getValue();
+        });
+    })
+</script>

@@ -35,3 +35,10 @@ class Stock(models.Model):
     office_address = models.CharField('办公地址', max_length=250)  # 办公地址
 
     territory = models.ForeignKey('Territory', verbose_name='地域', null=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return "%s(%s)" % (self.name, self.code)
+
+    class Meta:
+        verbose_name = '股票'
+        verbose_name_plural = verbose_name
