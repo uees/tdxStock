@@ -5,18 +5,22 @@
               style="display: none">{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
 </div>
 
-<script>
+<script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
         var editorEl = document.getElementById('json-editor-{{ widget.name }}');
         var textareaEl = document.getElementById('json-data-{{ widget.name }}');
 
-        function parse(v) {
+        var parse = function(v) {
             try {
-                JSON.parse(v)
+                v = JSON.parse(v)
             } catch (e) {
-                v = JSON.stringify(v)
+                v = v
             }
             return v
+        }
+
+        var formatValue = function(v) {
+            return JSON.stringify(parse(v), null, 4)
         }
 
         var editor = CodeMirror(editorEl, {
@@ -25,7 +29,7 @@
             gutters: ['CodeMirror-lint-markers'],
             theme: 'rubyblue',
             lint: true,
-            value: parse(textareaEl.value),
+            value: formatValue(textareaEl.value),
         });
 
         editor.on('change', function (cm) {

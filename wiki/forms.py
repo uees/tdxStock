@@ -9,7 +9,7 @@ class MarkdownWidget(forms.Textarea):
 
     def __init__(self, *args, **kwargs):
         self.template = kwargs.pop('template', 'widgets/editor_md.html')
-        self.lib = settings.STATIC_URL + "js/lib/"
+        self.lib = settings.STATIC_URL + "editor.md/lib/"
         self.width = kwargs.pop("width", "100%")
         self.height = kwargs.pop("height", "640")
         super().__init__(*args, **kwargs)
