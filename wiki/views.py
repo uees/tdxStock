@@ -1,13 +1,12 @@
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import CreateView, DetailView, ListView, DeleteView, UpdateView
-from django.conf import settings
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-
-from .models import Concept
 from .forms import ConceptForm
+from .models import Concept
 
 
 class ConceptListView(ListView):

@@ -1,7 +1,5 @@
-import json
-
-from django.template import loader
 from django import forms
+from django.template import loader
 
 
 class JsonEditorWidget(forms.Textarea):

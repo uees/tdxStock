@@ -1,0 +1,138 @@
+{% macro tips() %}
+  <div class="panel panel-default">
+    <div class="panel-heading">小帖士</div>
+    <div class="panel-body">
+      目前最流行的 Rails 部署方式是 Passenger, Thin, Puma 或者 Unicorn 配合 Nginx 使用，此外 Puma 已经开始被 Rails 社区推荐了。
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro resources() %}
+<div class="panel panel-default">
+  <div class="panel-heading">推荐 Ruby 资源</div>
+  <ul class="list-group">
+    <li class="list-group-item"><i class='fa fa-cloud'></i> <a href="/wiki/ruby-mirror">Ruby 镜像</a></li>
+    <li class="list-group-item"><i class='fa fa-diamond'></i> <a href="https://gems.ruby-china.org" target="_blank">RubyGems 镜像</a></li>
+    <li class="list-group-item"><i class='fa fa-youtube-play'></i> <a href="http://railscasts.com" target="_blank" rel="nofollow">Rails 视频教程</a></li>
+    <li class="list-group-item"><i class='fa fa-archive'></i> <a href="http://guides.ruby-china.org">Rails Guides 中文版</a></li>
+  </ul>
+</div>
+{% endmacro %}
+
+{% macro statistics(options) %}
+<div class="panel panel-default">
+  <div class="panel-heading">统计信息</div>
+  <ul class="list-group">
+    <li class="list-group-item">社区会员: {{ options.user_count }} 人</li>
+    <li class="list-group-item">帖子数: {{ options.post_count }} 个</li>
+    <li class="list-group-item">回帖数: {{ options.comment_count }} 条</li>
+  </ul>
+</div>
+{% endmacro %}
+
+{% macro note_info() %}
+<div class="panel panel-default">
+  <div class="panel-body">
+    <a href="/notes/new" class="btn btn-success btn-block">新建 Note</a>
+  </div>
+  <div class="panel-footer"><a href="/notes">查看我的 0 条 Note...</a></div>
+</div>
+{% endmacro %}
+
+{% macro post_info() %}
+<div class="panel panel-default">
+  <div class="panel-body">
+    <a href="/t/new" class="btn btn-success btn-block">发布新话题</a>
+  </div>
+  <div class="panel-footer"><a href="/posts">查看我的 0 条 话题...</a></div>
+</div>
+{% endmacro %}
+
+{% macro other_login() %}
+<div class="panel panel-default">
+  <div class="panel-heading">用其他平台的帐号登录</div>
+  <ul class="list-group">
+    <li class="list-group-item"><a class="btn btn-default btn-lg btn-block" href="/account/auth/github"><i class='fa fa-github'></i> GitHub</a> </li>
+    <li class="list-group-item"><a class="btn btn-default btn-lg btn-block" href="/account/auth/weibo"><i class='fa fa-weibo'></i> Weibo</a> </li>
+  </ul>
+</div>
+{% endmacro %}
+
+{% macro login_help() %}
+<div class="panel panel-default">
+  <ul class="list-group">
+    <li class="list-group-item"><a href="/account/sign_up">注册</a></li>
+    <li class="list-group-item"><a href="/account/password/new">忘记了密码?</a></li>
+    <li class="list-group-item"><a href="/account/unlock/new">未收到解锁邮件?</a></li>
+  </ul>
+</div>
+{% endmacro %}
+
+{% macro distribution(rows) %}
+  <table id="distributions" class="table table-striped table-sm">
+    <thead>
+      <tr>
+        <th>公布日期</th>
+        <th>分配年份</th>
+        <th>分红金额（每10股）</th>
+        <th>转增和送股数（每10股）</th>
+      </tr>
+    </thead>
+    <tbody>
+    {%- for row in rows %}
+      <tr>
+        <th scope="row">{{ row.report_date.strftime('%Y-%m-%d') }}</th>
+        <td>{{ row.year }}</td>
+        <td>{{ row.divi }}</td>
+        <td>{{ row.shares }}</td>
+      </tr>
+    {%- endfor %}
+    </tbody>
+  </table>
+{% endmacro %}
+
+{% macro xsg(rows) %}
+  <table id="xsg_unban" class="table table-striped table-sm">
+    <thead>
+      <tr>
+        <th>解禁日期</th>
+        <th>解禁数量（万股）</th>
+        <th>占总盘比率</th>
+      </tr>
+    </thead>
+    <tbody>
+    {%- for row in rows %}
+      <tr>
+        <td>{{ row.date.strftime('%Y-%m-%d') }}</th>
+        <td>{{ row.count }}</td>
+        <td>{{ row.ratio }}%</td>
+      </tr>
+    {%- endfor %}
+    </tbody>
+  </table>
+{% endmacro %}
+
+{% macro fund(rows) %}
+  <table id="funds" class="table table-striped table-sm">
+    <thead>
+      <tr>
+        <th>报告日期</th>
+        <th>基金家数</th>
+        <th>基金持股数（万股）</th>
+        <th>基金持股市值</th>
+        <th>占流通盘比率</th>
+      </tr>
+    </thead>
+    <tbody>
+    {%- for row in rows %}
+      <tr>
+        <td>{{ row.date.strftime('%Y-%m-%d') }}</th>
+        <td>{{ row.nums }}</td>
+        <td>{{ row.count }}</td>
+        <td>{{ row.amount }}</td>
+        <td>{{ row.ratio }}%</td>
+      </tr>
+    {%- endfor %}
+    </tbody>
+  </table>
+{% endmacro %}

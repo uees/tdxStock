@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+
+{% block title %} 概念列表 {% endblock %}
+
+{% block main %}
+<div class="main row">
+    <div class="col">
+        {% for concept in concepts -%}
+            <a class="btn btn-secondary btn-sm" href="{{ url_for('details.stocks', concept=concept) }}">{{ concept }}</a>
+        {%- endfor %}
+    </div>
+</div>
+{% endblock %}

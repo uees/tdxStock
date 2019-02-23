@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django_extensions.db.fields.json import JSONField
-from django.conf import settings
 
 from .models import Option
 from .widgets import JsonEditorWidget

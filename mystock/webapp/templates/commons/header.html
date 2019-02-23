@@ -1,0 +1,41 @@
+<!-- Fixed navbar -->
+<nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-primary">
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <a class="navbar-brand" href="{{ url_for('index') }}"><img src="/static/images/logo48.png" width="30" height="30" class="d-inline-block align-top" alt="">NEAT</a>
+  <div class="collapse navbar-collapse" id="navbarCollapse">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="{{ url_for('details.stocks') }}">基本数据 <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">分类数据</a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="{{ url_for('classified.sme') }}">中小板股票列表</a>
+          <a class="dropdown-item" href="{{ url_for('classified.gem') }}">创业板股票列表</a>
+          <a class="dropdown-item" href="{{ url_for('classified.hs300') }}">沪深300成份股</a>
+          <a class="dropdown-item" href="{{ url_for('classified.sz50') }}">上证50成份股</a>
+          <a class="dropdown-item" href="{{ url_for('classified.zz500') }}">中证500成份股</a>
+          <a class="dropdown-item" href="{{ url_for('classified.st') }}">风险警示板股票列表</a>
+          <a class="dropdown-item" href="{{ url_for('classified.terminated') }}">终止上市股票列表</a>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">宏观数据</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('classified.industries') }}">行业</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('classified.concepts') }}">概念</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('classified.area') }}">地域</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Wiki</a>
+      </li>
+    </ul>
+  </div>
+</nav>

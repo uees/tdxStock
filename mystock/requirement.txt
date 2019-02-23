@@ -1,0 +1,11 @@
+Flask
+Flask-Cache
+Flask-WTF
+Flask-Script
+Flask-Principal
+Flask-Mail
+Flask-Uploads
+Flask-MongoEngine
+markdown
+gevent
+gunicorn

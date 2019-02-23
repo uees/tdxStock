@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>{% block title %} NEAT {% endblock %}</title>
+  <meta name="author" contect="Mr.Wan">
+  <meta name="description" content="{% block description %}{% endblock %}">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
+  <!-- Custom styles -->
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  {%- block css %}{% endblock %}
+  {%- block js %}{% endblock %}
+</head>
+
+<body>
+  {% include 'commons/header.html' %}
+<!-- Begin page content -->
+<section class="jumbotron text-center">
+  <div class="container">
+    <h1 class="jumbotron-heading"><img src="static/images/logo512.png" width="128" height="128" alt="Neat"></h1>
+    <form method="GET" action="{{ url_for('details.stocks') }}" target="_blank">
+      <div class="form-group">
+        <input type="text" name="q" class="form-control form-control-lg" id="lgFormGroupInput">
+      </div>
+      <p>
+        <button type="submit" class="btn btn-primary">Neat Search</button>
+        <button type="button" class="btn btn-secondary">I'm Feeling Lucky</button>
+      </p>
+    </form>
+  </div>
+</section>
+  {% include 'commons/footer.html' %}
+  <!-- jQuery first, then Tether, then Bootstrap JS. -->
+  <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
+  <script src="//cdn.bootcss.com/echarts/3.4.0/echarts.common.min.js"></script>
+  {%- block bodyjs %}{% endblock %}
+</body>
+
+</html>
