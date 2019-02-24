@@ -1,25 +1,17 @@
-from django_extensions.db.fields import json
-from json.decoder import JSONDecodeError
+import json
+
+from django_extensions.db.fields.json import JSONField
+
+from tdxStock.helpers import is_json_stringify
 
 
-class JSONField(json.JSONField):
+class JSONField(JSONField):
+    """支持纯字符串的JSONField"""
 
-    def to_python(self, value):
-        """Convert our string value to JSON after we load it from the DB"""
-        try:
-            res = json.loads(value)
-        except JSONDecodeError:
-            res = value
-        except TypeError:
-            res = value
+    def get_db_prep_save(self, value, connection, **kwargs):
+        """Convert our JSON object to a string before we save"""
 
-        if isinstance(res, dict):
-            return json.JSONDict(**res)
-        elif isinstance(res, list):
-            return json.JSONList(res)
+        if isinstance(value, str) and not is_json_stringify(value):
+            value = json.dumps(value)
 
-        return res
-
-    def get_prep_value(self, value):
-        """将 python 对象转换为查询值"""
-        return json.dumps(value)
+        return super().get_db_prep_save(value, connection, **kwargs)
