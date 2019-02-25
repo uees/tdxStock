@@ -16,15 +16,14 @@ class JsonEditorWidget(forms.Textarea):
     class Media:
         css = {
             "all": (
-                "css/codemirror.css",
-                "codemirror/addon/lint/lint.css",
-                "codemirror/theme/rubyblue.css",
+                "editor.md/lib/codemirror/lib/codemirror.css",
+                "editor.md/lib/codemirror/addon/lint/lint.css",
             )
         }
         js = (
-            'js/codemirror.js',
-            'codemirror/mode/javascript/javascript.js',
-            'codemirror/addon/lint/jsonlint.js',
-            "codemirror/addon/lint/lint.js",
-            "codemirror/addon/lint/json-lint.js"
+            'js/jsonlint.js',
+            'editor.md/lib/codemirror/lib/codemirror.js',
+            'editor.md/lib/codemirror/mode/javascript/javascript.js',
+            "editor.md/lib/codemirror/addon/lint/lint.js",
+            "editor.md/lib/codemirror/addon/lint/json-lint.js"
         )
