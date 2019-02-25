@@ -1,5 +1,5 @@
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
-// Distributed under an MIT license: http://codemirror.net/LICENSE
+// Distributed under an MIT license: https://codemirror.net/LICENSE
 
 (function(mod) {
   if (typeof exports == "object" && typeof module == "object") // CommonJS
@@ -19,6 +19,10 @@
     var cur = cm.getCursor(), token = cm.getTokenAt(cur);
     var inner = CodeMirror.innerMode(cm.getMode(), token.state);
     if (inner.mode.name != "css") return;
+
+    if (token.type == "keyword" && "!important".indexOf(token.string) == 0)
+      return {list: ["!important"], from: CodeMirror.Pos(cur.line, token.start),
+              to: CodeMirror.Pos(cur.line, token.end)};
 
     var start = token.start, end = cur.ch, word = token.string.slice(0, end - start);
     if (/[^\w$_-]/.test(word)) {

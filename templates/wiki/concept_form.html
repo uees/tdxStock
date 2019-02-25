@@ -4,15 +4,15 @@
 {% block title %}{% if object %}编辑{% else %}创建{% endif %}概念{% endblock %}
 
 {% block header_css %}
-    <link rel="stylesheet" href="{% static 'css/editormd.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'editor.md/css/editormd.min.css' %}"/>
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static 'js/editormd.min.js' %}"></script>
+    <script src="{% static 'editor.md/editormd.min.js' %}"></script>
     <script type="text/javascript">
         $(function () {
             var editor = editormd("editormd", {
-                path: "/static/js/lib/",
+                path: "/static/editor.md/lib/",
                 height: 640,
                 saveHTMLToTextarea: true,
             });
@@ -37,7 +37,7 @@
 
         <div class="mb-3">
             {{ form.description.errors }}
-            <label for="description">{{ form.name.description }}</label>
+            <label for="description">{{ form.description.label }}</label>
             <div id="editormd">
                 <textarea id="description" name="description" class="editormd-markdown-textarea">{% if object %}{{ object.description }}{% endif %}</textarea>
                 <textarea name="description_html" class="editormd-html-textarea"></textarea>

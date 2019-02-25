@@ -33,17 +33,17 @@ class MarkdownWidget(forms.Textarea):
 
     class Media:
         css = {
-            "all": ("css/editormd.min.css",)
+            "all": ("editor.md/css/editormd.min.css",)
         }
         js = (
-            'js/editormd.min.js',
+            'editor.md/editormd.min.js',
         )
 
 
 class ConceptForm(forms.ModelForm):
     name = forms.CharField(label='名词', required=True, widget=forms.TextInput(
         attrs={'value': "", 'size': "30", 'maxlength': "245", 'aria-required': 'true'}))
-    description = forms.CharField(label='解释', required=True)
+    description = forms.CharField(label='描述', required=True)
 
     class Meta:
         model = Concept

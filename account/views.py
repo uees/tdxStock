@@ -1,9 +1,8 @@
-from django.conf import settings
 from django.contrib.auth import views
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import FormView
-from django.shortcuts import redirect
 
 from .forms import LoginForm, RegisterForm
 
@@ -12,6 +11,12 @@ class RegisterView(FormView):
     form_class = RegisterForm
     template_name = 'account/registration_form.html'
     success_url = '/'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(self.success_url)
+
+        return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
         user = form.save(False)

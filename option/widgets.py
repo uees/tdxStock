@@ -18,6 +18,7 @@ class JsonEditorWidget(forms.Textarea):
             "all": (
                 "editor.md/lib/codemirror/lib/codemirror.css",
                 "editor.md/lib/codemirror/addon/lint/lint.css",
+                "editor.md/lib/codemirror/theme/rubyblue.css",
             )
         }
         js = (

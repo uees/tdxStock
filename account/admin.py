@@ -8,4 +8,4 @@ class UserAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'username')
 
 
-admin.register(User, UserAdmin)
+admin.site.register(User, UserAdmin)
