@@ -18,6 +18,9 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.urls import path, include, re_path
 
+admin.AdminSite.site_title = settings.SITE_NAME
+admin.AdminSite.site_header = '%s 管理' % settings.SITE_NAME
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('account.urls')),

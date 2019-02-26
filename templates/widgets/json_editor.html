@@ -1,14 +1,14 @@
 <div class="json-editor">
-    <span id="help-{{ widget.name }}" class="has-error hidden"></span>
-    <div id="json-editor-{{ widget.name }}"></div>
-    <textarea id="json-data-{{ widget.name }}" name="{{ widget.name }}"{% include "widgets/attrs.html" %}
-              style="display: none">{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
+    <span id="help-{{ widget.attrs.id }}" class="has-error hidden"></span>
+    <div id="json-editor-{{ widget.attrs.id }}"></div>
+    <textarea name="{{ widget.name }}"{% include "widgets/attrs.html" %}
+              style="display: none">{% if widget.value %}{{ widget.value }}{% endif %}</textarea> <!-- textareaEl -->
 </div>
 
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
-        var editorEl = document.getElementById('json-editor-{{ widget.name }}');
-        var textareaEl = document.getElementById('json-data-{{ widget.name }}');
+        var editorEl = document.getElementById('json-editor-{{ widget.attrs.id }}');
+        var textareaEl = document.getElementById('{{ widget.attrs.id }}');
 
         var parse = function(v) {
             try {

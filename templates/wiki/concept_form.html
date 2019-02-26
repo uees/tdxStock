@@ -32,14 +32,14 @@
         <div class="mb-3">
             {{ form.name.errors }}
             <label for="name">{{ form.name.label }}</label>
-            <input name="name" type="text" class="form-control" id="name" placeholder="{{ form.name.label }}" required value="{% if object %}{{ object.name }}{% endif %}">
+            <input name="name" id="name" type="text" class="form-control" placeholder="{{ form.name.label }}" required value="{% if object %}{{ object.name }}{% endif %}">
         </div>
 
         <div class="mb-3">
             {{ form.description.errors }}
             <label for="description">{{ form.description.label }}</label>
             <div id="editormd">
-                <textarea id="description" name="description" class="editormd-markdown-textarea">{% if object %}{{ object.description }}{% endif %}</textarea>
+                <textarea name="description" id="description"  class="editormd-markdown-textarea">{% if object %}{{ object.description }}{% endif %}</textarea>
                 <textarea name="description_html" class="editormd-html-textarea"></textarea>
             </div>
         </div>

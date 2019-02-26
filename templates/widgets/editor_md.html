@@ -1,14 +1,16 @@
-<div class="wmd-wrapper" id="{{ id }}-wmd-wrapper">
+<div class="wmd-wrapper" id="{{ id }}-markdown-wrapper">
     <textarea name="{{ widget.name }}"{% include "widgets/attrs.html" %}
     >{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
+    <textarea name="description_html" class="editormd-html-textarea"></textarea>
 </div>
 
 <script type="text/javascript">
-    $(function () {
-        var editor = editormd("{{ id }}-wmd-wrapper", {
+    document.addEventListener('DOMContentLoaded', function () {
+        var editor = editormd("{{ id }}-markdown-wrapper", {
             width: "{{width}}",
             height: "{{height}}",
             path: "{{path}}",
+            saveHTMLToTextarea: true,
         });
     });
 </script>

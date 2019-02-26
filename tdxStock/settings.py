@@ -237,8 +237,8 @@ LOGGING = {
 IDENTICON_FOREGROUND = ['#000000', '#0000CC', '#0099CC', '#33CC33', '#33FFFF', '#6666FF',
                         '#66FF00', '#CC33CC', '#FF0033', '#FF6666', '#FFFF66', '#99CC66']
 
-SITE_NAME = '且听风吟'
-SITE_URL = 'http://www.lylinux.net'
+SITE_NAME = 'TdxStock'
+SITE_URL = 'http://localhost:8000'
 SITE_DESCRIPTION = '大巧无工,重剑无锋.'
 
 # bootstrap颜色样式
