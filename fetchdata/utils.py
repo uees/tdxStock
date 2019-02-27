@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from django.db.models.query import QuerySet
 
@@ -20,7 +20,13 @@ def _django_single_object_to_json(element, ignore=None):
 
 
 def timestamp(t):
+    """时间对象转时间戳"""
     return int(round(t * 1000))
+
+
+def fromtimestamp(t):
+    """时间戳转时间对象"""
+    return datetime.fromtimestamp(int(t) / 1000)
 
 
 def trans_cookie(cookie_str):

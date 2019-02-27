@@ -10,6 +10,7 @@
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 import os
+
 import environ
 
 from notebooks import setup
@@ -34,7 +35,7 @@ USER_AGENT = env('USER_AGENT')
 ROBOTSTXT_OBEY = env('ROBOTSTXT_OBEY', cast=bool, default=True)
 
 # 配置由 Scrapy 执行的最大并发请求(默认值:16)
-CONCURRENT_REQUESTS = 16
+CONCURRENT_REQUESTS = env('CONCURRENT_REQUESTS', cast=int, default=16)
 
 # 为同一网站的请求配置延迟 (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay

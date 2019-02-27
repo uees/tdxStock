@@ -3,6 +3,12 @@ from django.contrib import admin
 from .models import Stock, Industry, Concept, Territory, Section, ReportType, AccountingSubject, Report, ReportItem
 
 
+@admin.register(Stock)
+class StockAdmin(admin.ModelAdmin):
+    list_display = ('name', 'code', 'company_name', 'ownership_nature', 'registered_capital', 'found_date', 'listing_date')
+    list_display_links = ('name', 'code', 'company_name')
+
+
 @admin.register(ReportType)
 class ReportTypeAdmin(admin.ModelAdmin):
     list_select_related = ('parent',)
@@ -29,7 +35,6 @@ class AccountingSubjectAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-admin.site.register(Stock)
 admin.site.register(Industry)
 admin.site.register(Concept)
 admin.site.register(Territory)

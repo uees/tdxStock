@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 import json
-import scrapy
-
 from datetime import datetime
 from urllib.parse import urlencode
 
+import scrapy
+
 from basedata.models.stock import Stock
 from fetchdata import settings
-from fetchdata.utils import trans_cookie
 from fetchdata.items import StockItem
+from fetchdata.utils import trans_cookie
 
 
 class StockDetailSpider(scrapy.Spider):
@@ -44,7 +44,7 @@ class StockDetailSpider(scrapy.Spider):
             item['actual_controller'] = company.get('actual_controller')
             item['ownership_nature'] = company.get('classi_name')
             item['primary_business'] = company.get('main_operation_business')
-            item['company_profile']= company.get('org_cn_introduction')
+            item['company_profile'] = company.get('org_cn_introduction')
             item['chairman'] = company.get('chairman')
             item['legal_person'] = company.get('legal_representative')
             item['general_manager'] = company.get('general_manager')

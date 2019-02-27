@@ -7,8 +7,9 @@
 from scrapy.exceptions import DropItem
 
 from basedata.models.stock import Stock
-from .spiders.stock_list import StockSpider
+
 from .spiders.stock_detail import StockDetailSpider
+from .spiders.stock_list import StockSpider
 
 
 class StockPipeline(object):
@@ -35,6 +36,7 @@ class StockPipeline(object):
                 return item
 
         elif isinstance(spider, StockDetailSpider):
+            del item['name']
             Stock.objects.filter(code=item['code']).update(**dict(item))
             return item
 

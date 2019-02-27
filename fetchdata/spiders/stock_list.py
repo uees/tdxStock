@@ -1,8 +1,8 @@
-import time
 import json
-import scrapy
-
+import time
 from urllib.parse import urlencode
+
+import scrapy
 from scrapy import Request
 
 from fetchdata import settings
