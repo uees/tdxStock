@@ -7,7 +7,8 @@
 from scrapy.exceptions import DropItem
 
 from basedata.models.stock import Stock
-from .items import StockItem
+from .spiders.stock_list import StockSpider
+from .spiders.stock_detail import StockDetailSpider
 
 
 class StockPipeline(object):
@@ -17,7 +18,7 @@ class StockPipeline(object):
             self.codes[stock.code] = stock.name
 
     def process_item(self, item, spider):
-        if isinstance(item, StockItem):
+        if isinstance(spider, StockSpider):
             if item['code'] in self.codes:
                 if item['name'] == self.codes[item['code']]:
                     # 去重
@@ -32,5 +33,9 @@ class StockPipeline(object):
                 self.codes.update({item['code']: item['name']})
                 Stock.objects.create(**dict(item))
                 return item
+
+        elif isinstance(spider, StockDetailSpider):
+            Stock.objects.filter(code=item['code']).update(**dict(item))
+            return item
 
         return item

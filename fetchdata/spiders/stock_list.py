@@ -4,21 +4,21 @@ import scrapy
 
 from urllib.parse import urlencode
 from scrapy import Request
-from fetchdata.utils import timestamp, trans_cookie
+
 from fetchdata import settings
 from fetchdata.items import StockItem
+from fetchdata.utils import timestamp, trans_cookie
 
 
 class StockSpider(scrapy.Spider):
     """股票列表采集"""
     name = 'stock_list'
     allowed_domains = ['xueqiu.com']
-    base_url = settings.env('STOCK_LIST_API')
 
     def start_requests(self):
         per_page = settings.env('STOCK_LIST_PER_PAGE', cast=int)
         max_page = settings.env('STOCK_MAX_PAGES', cast=int)
-        cookies = trans_cookie(settings.XUEQIU_COOKIES)
+        cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))
         headers = {
             'X-Requested-With': 'XMLHttpRequest',
             'Referer': settings.env('STOCK_LIST_API_REFERER'),
@@ -35,7 +35,7 @@ class StockSpider(scrapy.Spider):
                 '_': timestamp(time.time()),
             }
 
-            url = "%s?%s" % (self.base_url, urlencode(params))
+            url = "%s?%s" % (settings.env('STOCK_LIST_API'), urlencode(params))
 
             yield Request(url, cookies=cookies, headers=headers)
 

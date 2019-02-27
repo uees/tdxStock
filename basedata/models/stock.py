@@ -12,6 +12,7 @@ class Stock(models.Model):
     ownership_nature = models.CharField('所有制性质名称', max_length=200, null=True, blank=True)
     primary_business = models.TextField('主营业务', null=True, blank=True)
     company_profile = models.TextField('公司简介', null=True, blank=True)
+    operating_scope = models.TextField('经营范围', null=True, blank=True)
     chairman = models.CharField('董事长', max_length=64, null=True, blank=True)
     legal_person = models.CharField('法人代表', max_length=64, null=True, blank=True)
     general_manager = models.CharField('总经理', max_length=64, null=True, blank=True)
@@ -40,7 +41,7 @@ class Stock(models.Model):
                                   on_delete=models.SET_NULL)
 
     def __str__(self):
-        return "%s(%s)" % (self.name, self.code)
+        return self.name
 
     class Meta:
         verbose_name = '股票'
