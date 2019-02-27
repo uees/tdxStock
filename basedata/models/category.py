@@ -3,8 +3,8 @@ from django.db import models
 
 class Industry(models.Model):
     """行业"""
-    name = models.CharField(max_length=200)
-    memo = models.TextField()
+    name = models.CharField('名称', max_length=200)
+    memo = models.TextField('备注', null=True, blank=True)
     stocks = models.ManyToManyField('Stock', through='IndustryStock')
 
     def __str__(self):
@@ -16,15 +16,15 @@ class Industry(models.Model):
 
 
 class IndustryStock(models.Model):
-    stock = models.ForeignKey('Stock', on_delete=models.CASCADE)
-    industry = models.ForeignKey(Industry, on_delete=models.CASCADE)
-    date_joined = models.DateField()
+    stock = models.ForeignKey('Stock', verbose_name='股票', on_delete=models.CASCADE)
+    industry = models.ForeignKey(Industry, verbose_name='行业', on_delete=models.CASCADE)
+    date_joined = models.DateField('加入日期', null=True, blank=True)
 
 
 class Concept(models.Model):
     """概念"""
-    name = models.CharField(max_length=200)
-    memo = models.TextField()
+    name = models.CharField("名称", max_length=200)
+    memo = models.TextField('备注', null=True, blank=True)
     stocks = models.ManyToManyField('Stock', through='ConceptStock')
 
     def __str__(self):
@@ -36,14 +36,14 @@ class Concept(models.Model):
 
 
 class ConceptStock(models.Model):
-    stock = models.ForeignKey('Stock', on_delete=models.CASCADE)
-    concept = models.ForeignKey(Concept, on_delete=models.CASCADE)
-    date_joined = models.DateField()
+    stock = models.ForeignKey('Stock', verbose_name="股票", on_delete=models.CASCADE)
+    concept = models.ForeignKey(Concept, verbose_name="概念", on_delete=models.CASCADE)
+    date_joined = models.DateField('加入日期', null=True, blank=True)
 
 
 class Territory(models.Model):
     """地域"""
-    name = models.CharField(max_length=200)
+    name = models.CharField("名称", max_length=200)
 
     def __str__(self):
         return self.name
@@ -55,8 +55,8 @@ class Territory(models.Model):
 
 class Section(models.Model):
     """版块"""
-    name = models.CharField(max_length=200)
-    memo = models.TextField()
+    name = models.CharField("名称", max_length=200)
+    memo = models.TextField('备注', null=True, blank=True)
     stocks = models.ManyToManyField('Stock', through='SectionStock')
 
     def __str__(self):
@@ -68,6 +68,6 @@ class Section(models.Model):
 
 
 class SectionStock(models.Model):
-    stock = models.ForeignKey('Stock', on_delete=models.CASCADE)
-    section = models.ForeignKey(Section, on_delete=models.CASCADE)
-    date_joined = models.DateField()
+    stock = models.ForeignKey('Stock', verbose_name="股票", on_delete=models.CASCADE)
+    section = models.ForeignKey(Section, verbose_name="版块", on_delete=models.CASCADE)
+    date_joined = models.DateField('加入日期', null=True, blank=True)
