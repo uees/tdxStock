@@ -33,9 +33,8 @@ class StockDetailSpider(scrapy.Spider):
     def parse(self, response):
         body = json.loads(response.body)
 
-        if body.get('error_code') == 0:  # 无错误
-            company = body.get('data', {}).get('company', {})
-
+        company = body.get('data', {}).get('company', {})
+        if company:
             item = StockItem()
             item['name'] = company.get('org_short_name_cn')
             item['code'] = response.meta.get('stock_code')
