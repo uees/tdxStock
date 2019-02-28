@@ -9,6 +9,12 @@ class Industry(models.Model):
     stocks = models.ManyToManyField('Stock', through='IndustryStock')
 
     def __str__(self):
+        if self.parent:
+            if self.parent.parent:
+                return "%s -> %s -> %s" % (self.parent.parent.name, self.parent.name, self.name)
+
+            return "%s -> %s" % (self.parent.name, self.name)
+
         return self.name
 
     class Meta:

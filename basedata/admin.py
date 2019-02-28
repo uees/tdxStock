@@ -1,6 +1,33 @@
 from django.contrib import admin
 
-from .models import Stock, Industry, Concept, Territory, Section, ReportType, AccountingSubject, Report, ReportItem
+from .models import (AccountingSubject, Concept, Industry, Report, ReportItem,
+                     ReportType, Section, Stock, Territory)
+
+
+@admin.register(Industry)
+class IndustryAdmin(admin.ModelAdmin):
+    list_select_related = ('parent', 'parent__parent')
+
+    def get_queryset(self, request):
+        """
+        Return a QuerySet of all model instances that can be edited by the
+        admin site. This is used by changelist_view.
+        """
+        qs = self.model._default_manager.get_queryset()
+        # 只显示3级分类
+        qs = qs.filter(parent__parent__isnull=False)
+        ordering = self.get_ordering(request)
+        if ordering:
+            qs = qs.order_by(*ordering)
+        return qs
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "parent":
+            # 只展示1·2级分类
+            kwargs["queryset"] = Industry.objects.select_related(*self.list_select_related)\
+                .filter(parent__parent__isnull=True)
+
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 @admin.register(Stock)
@@ -37,7 +64,6 @@ class AccountingSubjectAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-admin.site.register(Industry)
 admin.site.register(Concept)
 admin.site.register(Territory)
 admin.site.register(Section)
