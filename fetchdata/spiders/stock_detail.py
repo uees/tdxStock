@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-from datetime import datetime
 from urllib.parse import urlencode
 
 import scrapy
@@ -8,7 +7,7 @@ import scrapy
 from basedata.models.stock import Stock
 from fetchdata import settings
 from fetchdata.items import StockItem
-from fetchdata.utils import trans_cookie
+from fetchdata.utils import fromtimestamp, trans_cookie
 
 
 class StockDetailSpider(scrapy.Spider):
@@ -17,7 +16,8 @@ class StockDetailSpider(scrapy.Spider):
 
     def start_requests(self):
         cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))
-        for stock in Stock.objects.only('name', 'code').all():
+        # for stock in Stock.objects.only('name', 'code').all():
+        for stock in Stock.objects.filter(company_name__isnull=True).only('name', 'code').all():
             headers = {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Referer': settings.env('STOCK_DETAIL_API_REFERER').format(code=stock.code),
@@ -70,9 +70,9 @@ class StockDetailSpider(scrapy.Spider):
                 item['exchange_code'] = 'XSHE'
 
             if isinstance(company.get('established_date'), int):
-                item['found_date'] = datetime.fromtimestamp(company.get('established_date')/1000)
+                item['found_date'] = fromtimestamp(company.get('established_date'))
 
             if isinstance(company.get('listed_date'), int):
-                item['listing_date'] = datetime.fromtimestamp(company.get('listed_date')/1000)
+                item['listing_date'] = fromtimestamp(company.get('listed_date'))
 
             yield item

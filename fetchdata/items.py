@@ -43,3 +43,31 @@ class StockItem(scrapy.Item):
     updated_at = scrapy.Field()
     last_report = scrapy.Field()
     territory = scrapy.Field()
+    industry = scrapy.Field()
+    concept = scrapy.Field()
+    section = scrapy.Field()
+
+
+class IndustryItem(scrapy.Item):
+    """行业"""
+    parent = scrapy.Field()
+    name = scrapy.Field()
+    memo = scrapy.Field()
+
+
+class ConceptItem(scrapy.Item):
+    """概念"""
+    name = scrapy.Field()
+    memo = scrapy.Field()
+
+
+class TerritoryItem(scrapy.Item):
+    """地域"""
+    name = scrapy.Field()
+    memo = scrapy.Field()
+
+
+class SectionItem(scrapy.Item):
+    """版块"""
+    name = scrapy.Field()
+    memo = scrapy.Field()

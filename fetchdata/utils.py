@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from urllib.parse import parse_qsl, urlparse
 
 from django.db.models.query import QuerySet
 
@@ -26,17 +27,34 @@ def timestamp(t):
 
 def fromtimestamp(t):
     """时间戳转时间对象"""
-    return datetime.fromtimestamp(int(t) / 1000)
+    t /= 1000
+    if t < 0:
+        return datetime(1970, 1, 1) + timedelta(seconds=t) + timedelta(hours=8)
+
+    return datetime.fromtimestamp(t)
 
 
 def trans_cookie(cookie_str):
-    cookies = {}
-    items = cookie_str.split(';')
+    return string2dict(cookie_str)
+
+
+def string2dict(string, eq="=", split=";"):
+    result = {}
+    items = string.split(split)
 
     for item in items:
-        eqpos = item.find('=')
-        key = item[:eqpos].replace(' ', '')
-        value = item[eqpos + 1:]
-        cookies[key] = value
+        eq_pos = item.find(eq)
+        key = item[:eq_pos].strip()
+        value = item[eq_pos + len(eq):]
+        result[key] = value
 
-    return cookies
+    return result
+
+
+def get_params(response):
+    params = {}
+    url = response.request.url
+    for item in parse_qsl(urlparse(url).query):
+        params[item[0]] = item[1]
+
+    return params

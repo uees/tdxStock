@@ -7,6 +7,8 @@ from .models import Stock, Industry, Concept, Territory, Section, ReportType, Ac
 class StockAdmin(admin.ModelAdmin):
     list_display = ('name', 'code', 'company_name', 'ownership_nature', 'registered_capital', 'found_date', 'listing_date')
     list_display_links = ('name', 'code', 'company_name')
+    search_fields = ('name', 'code', 'company_name')
+    list_filter = ('ownership_nature',)
 
 
 @admin.register(ReportType)
