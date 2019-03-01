@@ -75,7 +75,7 @@ class ReportItem(models.Model):
     ]
     report = models.ForeignKey(Report, verbose_name='报表', on_delete=models.CASCADE)
     subject = models.ForeignKey(AccountingSubject, on_delete=models.CASCADE)
-    value = models.TextField('值', null=True, blank=True)
+    value = models.CharField('值', max_length=250, null=True, blank=True)
     value_type = models.CharField('值数据类型', choices=VALUE_TYPES, max_length=64, null=True, blank=True)
     value_unit = models.CharField('数据单位', max_length=64, null=True, blank=True)
 
