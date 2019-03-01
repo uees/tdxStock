@@ -80,23 +80,19 @@ class PrimaryIndicatorSpider(scrapy.Spider):
                 if match:
                     report_year = int(match.group('year'))
                     report_quarter = get_quarter_by_report_type(match.group('report_type'))
-
-                    report_date = report.get('report_date')
-                    defaults = {}
-                    if report_date:
-                        defaults.update({
-                            'report_date': fromtimestamp(report_date)
-                        })
+                    report_date = fromtimestamp(report.get('report_date')) if report.get('report_date') else None
 
                     # 获取报告对象
-                    report_obj, _ = Report.objects.update_or_create(
-                        name=report.get('report_name'),
+                    report_obj, _ = Report.objects.get_or_create(
                         stock=response.meta['stock'],
                         report_type=report_type,
                         year=report_year,
                         quarter=report_quarter,
                         is_single_quarter=self.is_single_quarter,
-                        defaults=defaults
+                        defaults={
+                            'report_date': report_date,
+                            'name': report.get('report_name'),
+                        }
                     )
 
                     for slug, value in report.items():
@@ -118,7 +114,7 @@ class PrimaryIndicatorSpider(scrapy.Spider):
                         else:
                             value_type = 'STRING'
 
-                        report_item, _ = ReportItem.objects.update_or_create(
+                        report_item, _ = ReportItem.objects.get_or_create(
                             report=report_obj,
                             subject=subject,
                             defaults={
@@ -128,7 +124,7 @@ class PrimaryIndicatorSpider(scrapy.Spider):
                         )
 
                     yield ScrapyReportItem({
-                        "report_date": report.get('report_date'),
+                        "report_date": report_date,
                         "report_name": report.get('report_name'),
                         "stock_name": response.meta['stock'].name,
                         "stock_code": response.meta['stock'].code,
