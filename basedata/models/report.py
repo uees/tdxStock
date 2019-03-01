@@ -52,15 +52,6 @@ class Report(models.Model):
     report_date = models.DateField('公布日期', null=True, blank=True)
     is_single_quarter = models.BooleanField('是否单季报', default=True)
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
-        type_quarter = '单季度' if self.is_single_quarter else '报告期'
-        self.name = '%s(%s) %s-%s %s(%s)' % (self.stock.name, self.stock.code,
-                                             self.year, self.quarter,
-                                             self.report_type.name, type_quarter)
-
-        super().save(force_insert, force_update, using, update_fields)
-
     def __str__(self):
         return self.name
 
