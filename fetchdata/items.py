@@ -77,3 +77,5 @@ class ReportItem(scrapy.Item):
     """报表"""
     report_date = scrapy.Field()
     report_name = scrapy.Field()
+    stock_name = scrapy.Field()
+    stock_code = scrapy.Field()

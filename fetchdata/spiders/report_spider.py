@@ -129,7 +129,9 @@ class PrimaryIndicatorSpider(scrapy.Spider):
 
                     yield ScrapyReportItem({
                         "report_date": report.get('report_date'),
-                        "report_name": report.get('report_name')
+                        "report_name": report.get('report_name'),
+                        "stock_name": response.meta['stock'].name,
+                        "stock_code": response.meta['stock'].code,
                     })
 
         # 上市日期
