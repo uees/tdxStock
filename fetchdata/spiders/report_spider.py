@@ -88,10 +88,10 @@ class PrimaryIndicatorSpider(scrapy.Spider):
                         report_type=report_type,
                         year=report_year,
                         quarter=report_quarter,
-                        is_single_quarter=self.is_single_quarter,
                         defaults={
                             'report_date': report_date,
                             'name': report.get('report_name'),
+                            'is_single_quarter': self.is_single_quarter,  # 其实 report_type 就决定了 "单季度" 或 "报告期"
                         }
                     )
 
@@ -114,6 +114,7 @@ class PrimaryIndicatorSpider(scrapy.Spider):
                         else:
                             value_type = 'STRING'
 
+                        # 这个表数据量大, 需要对 [report_id, subject_id] 设置联合索引来提速
                         report_item, _ = ReportItem.objects.get_or_create(
                             report=report_obj,
                             subject=subject,

@@ -40,6 +40,7 @@ class AccountingSubject(models.Model):
     class Meta:
         verbose_name = '会计科目'
         verbose_name_plural = verbose_name
+        unique_together = ["slug", "report_type"]
 
 
 class Report(models.Model):
@@ -66,6 +67,7 @@ class Report(models.Model):
     class Meta:
         verbose_name = '报表'
         verbose_name_plural = verbose_name
+        unique_together = ["stock", "report_type", 'year', 'quarter']
 
 
 class ReportItem(models.Model):
@@ -85,3 +87,4 @@ class ReportItem(models.Model):
     class Meta:
         verbose_name = '报表项'
         verbose_name_plural = verbose_name
+        unique_together = ["report", "subject"]
