@@ -86,7 +86,7 @@ def get_quarter_date(year, quarter):
         return datetime(year, 3, 31)
 
     if quarter == 2:
-        return datetime(year, 6, 31)
+        return datetime(year, 6, 30)
 
     if quarter == 3:
         return datetime(year, 9, 30)
