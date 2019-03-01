@@ -6,8 +6,8 @@ import scrapy
 
 from basedata.models.category import Industry, IndustryStock
 from basedata.models.stock import Stock
-from fetchdata.utils import string2dict, get_params
 from fetchdata.items import IndustryItem, StockItem
+from fetchdata.utils import get_params, string2dict
 
 
 class IndustrySpiderSpider(scrapy.Spider):
@@ -108,4 +108,3 @@ class IndustrySpiderSpider(scrapy.Spider):
                 url = "%s?%s" % (self.api, urlencode(params))
                 yield scrapy.Request(url, headers=self.headers, callback=self.parse_stocks,
                                      meta={"industry": response.meta['industry']})
-

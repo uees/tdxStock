@@ -4,8 +4,19 @@ from .models import (AccountingSubject, Concept, Industry, Report, ReportItem,
                      ReportType, Section, Stock, Territory)
 
 
+@admin.register(Concept)
+class ConceptAdmin(admin.ModelAdmin):
+    list_display = ('name', 'memo')
+
+
+@admin.register(Section)
+class SectionAdmin(admin.ModelAdmin):
+    list_display = ('name', 'memo')
+
+
 @admin.register(Industry)
 class IndustryAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'memo')
     list_select_related = ('parent', 'parent__parent')
 
     def get_queryset(self, request):
@@ -64,8 +75,6 @@ class AccountingSubjectAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-admin.site.register(Concept)
 admin.site.register(Territory)
-admin.site.register(Section)
 admin.site.register(Report)
 admin.site.register(ReportItem)

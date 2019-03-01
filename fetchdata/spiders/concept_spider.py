@@ -4,9 +4,9 @@ from urllib.parse import urlencode
 
 import scrapy
 
-from basedata.models import Concept, Stock, ConceptStock
+from basedata.models import Concept, ConceptStock, Stock
 from fetchdata.items import ConceptItem, StockItem
-from fetchdata.utils import string2dict, get_params
+from fetchdata.utils import get_params, string2dict
 
 
 class ConceptSpiderSpider(scrapy.Spider):

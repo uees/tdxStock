@@ -1,6 +1,8 @@
+import time
 from datetime import datetime, timedelta
 from urllib.parse import parse_qsl, urlparse
 
+import pytz
 from django.db.models.query import QuerySet
 
 
@@ -21,15 +23,20 @@ def _django_single_object_to_json(element, ignore=None):
 
 
 def timestamp(t):
-    """时间对象转时间戳"""
+    """时间对象转时间戳(毫秒级)"""
+    if isinstance(t, datetime):
+        return int(round(t.timestamp() * 1000))
+
     return int(round(t * 1000))
 
 
 def fromtimestamp(t):
-    """时间戳转时间对象"""
+    """毫秒级时间戳转时间对象"""
     t /= 1000
     if t < 0:
-        return datetime(1970, 1, 1) + timedelta(seconds=t) + timedelta(hours=8)
+        d = datetime(1970, 1, 1, tzinfo=pytz.utc) + timedelta(seconds=t)  # <1970 先转化为 UTC 时间
+        tz = pytz.timezone('Asia/Shanghai')
+        return d.astimezone(tz)  # 再转为北京时间
 
     return datetime.fromtimestamp(t)
 
@@ -58,3 +65,31 @@ def get_params(response):
         params[item[0]] = item[1]
 
     return params
+
+
+def get_quarter_by_report_type(report_type):
+    if report_type == '年报':
+        return 4
+
+    if report_type == '三季报':
+        return 3
+
+    if report_type == '中报':
+        return 2
+
+    if report_type == '一季报':
+        return 1
+
+
+def get_quarter_date(year, quarter):
+    if quarter == 1:
+        return datetime(year, 3, 31)
+
+    if quarter == 2:
+        return datetime(year, 6, 31)
+
+    if quarter == 3:
+        return datetime(year, 9, 30)
+
+    if quarter == 4:
+        return datetime(year, 12, 31)

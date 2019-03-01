@@ -5,8 +5,8 @@ from urllib.parse import urlencode
 import scrapy
 
 from basedata.models import Stock, Territory
-from fetchdata.items import TerritoryItem, StockItem
-from fetchdata.utils import string2dict, get_params
+from fetchdata.items import StockItem, TerritoryItem
+from fetchdata.utils import get_params, string2dict
 
 
 class TerritorySpiderSpider(scrapy.Spider):

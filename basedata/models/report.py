@@ -29,8 +29,8 @@ class ReportType(models.Model):
 
 class AccountingSubject(models.Model):
     report_type = models.ForeignKey(ReportType, verbose_name="报表类型", on_delete=models.CASCADE, null=True)
-    name = models.CharField('科目名称', max_length=200)
-    slug = models.CharField(max_length=200, null=True)
+    name = models.CharField('科目名称', max_length=200, null=True, blank=True)
+    slug = models.CharField(max_length=200, null=True, blank=True)
     parent = models.ForeignKey('self', verbose_name='上级科目', on_delete=models.CASCADE, null=True, blank=True)
     memo = models.TextField('备注', null=True, blank=True)
 
