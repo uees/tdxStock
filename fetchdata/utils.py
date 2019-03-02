@@ -1,4 +1,4 @@
-import time
+import re
 from datetime import datetime, timedelta
 from urllib.parse import parse_qsl, urlparse
 
@@ -68,16 +68,16 @@ def get_params(response):
 
 
 def get_quarter_by_report_type(report_type):
-    if report_type == '年报':
+    if report_type in ['年报', '四季度']:
         return 4
 
-    if report_type == '三季报':
+    if report_type in ['三季报', '三季度']:
         return 3
 
-    if report_type == '中报':
+    if report_type in ['中报', '二季度']:
         return 2
 
-    if report_type == '一季报':
+    if report_type in ['一季报', '一季度']:
         return 1
 
 
@@ -93,3 +93,15 @@ def get_quarter_date(year, quarter):
 
     if quarter == 4:
         return datetime(year, 12, 31)
+
+
+def parse_report_name(report_name):
+    p = re.compile(r'(?P<year>\d{4})(?P<report_type>.+)')
+    match = p.match(report_name)
+    if match:
+        report_year = int(match.group('year'))
+        report_quarter = get_quarter_by_report_type(match.group('report_type'))
+
+        return report_year, report_quarter
+
+    return None, None

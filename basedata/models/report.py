@@ -8,19 +8,12 @@ class ReportType(models.Model):
         ('consolidated_balance_sheet', '资产负债表'),
         ('cash_flow_sheet', '现金流量表'),
     ]
-    parent = models.ForeignKey('self', verbose_name='上级类型', on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField('报表类型', max_length=200)
-    slug = models.CharField(max_length=200, null=True)
+    slug = models.CharField(max_length=200, null=True, unique=True)
     memo = models.TextField('备注', null=True, blank=True)
 
     def __str__(self):
         return self.name
-
-    def get_subject_set(self):
-        if self.accountingsubject_set.exists():
-            return self.accountingsubject_set
-
-        return self.parent.get_subject_set()
 
     class Meta:
         verbose_name = '报表类型'
@@ -58,7 +51,7 @@ class Report(models.Model):
     class Meta:
         verbose_name = '报表'
         verbose_name_plural = verbose_name
-        unique_together = ["stock", "report_type", 'year', 'quarter']
+        unique_together = ["stock", "report_type", 'is_single_quarter', 'year', 'quarter']
 
 
 class ReportItem(models.Model):

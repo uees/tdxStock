@@ -1,20 +1,17 @@
 # -*- coding: utf-8 -*-
 import json
-import re
-import sys
 from urllib.parse import urlencode
 
 import scrapy
 
-from basedata.models import (AccountingSubject, Report, ReportItem, ReportType,
-                             Stock)
+from basedata.models import Stock
 from fetchdata import settings
 from fetchdata.items import ReportItem as ScrapyReportItem
-from fetchdata.utils import (get_params, get_quarter_by_report_type,
-                             get_quarter_date, timestamp, trans_cookie, fromtimestamp)
+from fetchdata.utils import (fromtimestamp, get_params, get_quarter_date,
+                             parse_report_name, timestamp, trans_cookie)
 
 
-class PrimaryIndicatorSpider(scrapy.Spider):
+class ReportSpider(scrapy.Spider):
     name = 'report_spider'
     allowed_domains = ['xueqiu.com']
     api = "https://stock.xueqiu.com/v5/stock/finance/cn/{report}.json"
@@ -22,33 +19,28 @@ class PrimaryIndicatorSpider(scrapy.Spider):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if getattr(self, 'quarter', 'S0') == 'S0':
+        if getattr(self, 'quarter') == 'S0':
             self.is_single_quarter = True
+            self.type = 'S0'
         else:
             self.is_single_quarter = False
+            self.type = 'all'
 
         if getattr(self, 'report') == 'income':  # 利润表
-            self.report_type = ReportType.objects.get(slug='consolidated_income_sheet')
-            self.quarter_report_type = ReportType.objects.get(slug='quarter_consolidated_income_sheet')
+            self.report_type = 'consolidated_income_sheet'
         elif getattr(self, 'report') == 'indicator':  # 主要指标
-            self.report_type = ReportType.objects.get(slug='primary_indicator_sheet')
-            self.quarter_report_type = ReportType.objects.get(slug='quarter_primary_indicator_sheet')
+            self.report_type = 'primary_indicator_sheet'
         elif getattr(self, 'report') == 'balance':  # 资产负债表
-            self.report_type = ReportType.objects.get(slug='consolidated_balance_sheet')
-            self.quarter_report_type = ReportType.objects.get(slug='quarter_consolidated_balance_sheet')
+            self.report_type = 'consolidated_balance_sheet'
         elif getattr(self, 'report') == 'cash_flow':  # 现金流量表
-            self.report_type = ReportType.objects.get(slug='cash_flow_sheet')
-            self.quarter_report_type = ReportType.objects.get(slug='quarter_cash_flow_sheet')
-        else:
-            raise Exception('没有指定 report 参数')
-            sys.exit()
+            self.report_type = 'cash_flow_sheet'
 
     def start_requests(self):
         cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))
         for stock in Stock.objects.only('listing_date', 'name', 'code').all():
             params = {
                 "symbol": stock.code,
-                "type": getattr(self, 'quarter', 'all'),
+                "type": self.type,
                 "is_detail": True,
                 "count": 5,
                 "timestamp": "",
@@ -68,67 +60,21 @@ class PrimaryIndicatorSpider(scrapy.Spider):
         body = json.loads(response.body)
         data = body.get('data', {})
 
-        p = re.compile(r'(?P<year>\d{4})(?P<report_type>.+)')
-        reports = data.get('list', [])
-
-        for report in reports:
+        for report in data.get('list', []):
             if isinstance(report, dict):
-                report_type = self.quarter_report_type if self.is_single_quarter else self.report_type
+                report_data = report.copy()
+                del report_data['report_date']
+                del report_data['report_name']
 
-                report_name = report.get('report_name', '')
-                match = p.match(report_name)
-                if match:
-                    report_year = int(match.group('year'))
-                    report_quarter = get_quarter_by_report_type(match.group('report_type'))
-                    report_date = fromtimestamp(report.get('report_date')) if report.get('report_date') else None
-
-                    # 获取报告对象
-                    report_obj, _ = Report.objects.get_or_create(
-                        stock=response.meta['stock'],
-                        report_type=report_type,
-                        year=report_year,
-                        quarter=report_quarter,
-                        defaults={
-                            'report_date': report_date,
-                            'name': report.get('report_name'),
-                            'is_single_quarter': self.is_single_quarter,  # 其实 report_type 就决定了 "单季度" 或 "报告期"
-                        }
-                    )
-
-                    for slug, value in report.items():
-                        # 获得 subject
-                        subject, _ = AccountingSubject.objects.get_or_create(
-                            slug=slug,
-                            report_type=self.report_type,
-                            defaults={
-                                "memo": "由 spider 创建"
-                            }
-                        )
-
-                        # 创建报告项目
-                        if isinstance(value, list):
-                            value = value[0]
-
-                        if isinstance(value, int) or isinstance(value, float):
-                            value_type = 'NUMBER'
-                        else:
-                            value_type = 'STRING'
-
-                        # 这个表数据量大, 需要对 [report_id, subject_id] 设置联合索引来提速
-                        report_item, _ = ReportItem.objects.get_or_create(
-                            report=report_obj,
-                            subject=subject,
-                            defaults={
-                                'value': value,
-                                'value_type': value_type,
-                            }
-                        )
-
-                    yield ScrapyReportItem({
-                        "report_date": report_date,
-                        "report_name": report.get('report_name'),
-                        "stock_name": response.meta['stock'].name,
-                        "stock_code": response.meta['stock'].code,
+                yield ScrapyReportItem({
+                    "stock_id": response.meta['stock'].id,
+                    "stock_name": response.meta['stock'].name,
+                    "stock_code": response.meta['stock'].code,
+                    "report_date": fromtimestamp(report.get('report_date')) if report.get('report_date') else None,
+                    "report_name": report.get('report_name', ''),
+                    "report_data": report_data,
+                    "report_type": self.report_type,
+                    "is_single_quarter": self.is_single_quarter,
                     })
 
         # 上市日期
@@ -139,11 +85,9 @@ class PrimaryIndicatorSpider(scrapy.Spider):
             listed_year = 2008
 
         last_report_name = data.get('last_report_name', '')
-        match = p.match(last_report_name)
-        if match:
-            last_report_year = int(match.group('year'))
-            last_report_quarter = get_quarter_by_report_type(match.group('report_type'))
 
+        last_report_year, last_report_quarter = parse_report_name(last_report_name)
+        if last_report_year and last_report_quarter:
             # 默认追踪到上市前两年的报告
             if last_report_year > listed_year - 2:
                 params = get_params(response)

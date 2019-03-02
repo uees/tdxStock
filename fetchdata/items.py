@@ -75,7 +75,11 @@ class SectionItem(scrapy.Item):
 
 class ReportItem(scrapy.Item):
     """报表"""
-    report_date = scrapy.Field()
-    report_name = scrapy.Field()
+    stock_id = scrapy.Field()
     stock_name = scrapy.Field()
     stock_code = scrapy.Field()
+    report_date = scrapy.Field()
+    report_name = scrapy.Field()
+    report_data = scrapy.Field()
+    report_type = scrapy.Field()
+    is_single_quarter = scrapy.Field()

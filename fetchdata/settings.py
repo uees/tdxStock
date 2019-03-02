@@ -79,7 +79,8 @@ DEFAULT_REQUEST_HEADERS = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'fetchdata.pipelines.StockPipeline': 300,
+    # 'fetchdata.pipelines.StockPipeline': 300,
+    'fetchdata.pipelines.ReportPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -102,3 +103,7 @@ AUTOTHROTTLE_DEBUG = False
 # HTTPCACHE_DIR = 'httpcache'
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+REDIS_HOST = env('REDIS_HOST')
+REDIS_PORT = env('REDIS_PORT', cast=int)
+REDIS_SPIDER_DB = env('REDIS_SPIDER_DB', cast=int)

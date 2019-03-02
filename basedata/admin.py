@@ -51,11 +51,9 @@ class StockAdmin(admin.ModelAdmin):
 
 @admin.register(ReportType)
 class ReportTypeAdmin(admin.ModelAdmin):
-    list_select_related = ('parent',)
     list_per_page = 20
-    list_display = ('parent', 'name', 'slug', 'memo')
+    list_display = ('name', 'slug', 'memo')
     list_display_links = ('name',)
-    list_filter = ('parent',)
     search_fields = ('name', 'slug')
 
 
