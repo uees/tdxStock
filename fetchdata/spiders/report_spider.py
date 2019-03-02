@@ -37,7 +37,7 @@ class ReportSpider(scrapy.Spider):
 
     def start_requests(self):
         cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))
-        for stock in Stock.objects.only('listing_date', 'name', 'code').all():
+        for stock in Stock.objects.only('id', 'listing_date', 'name', 'code').all():
             params = {
                 "symbol": stock.code,
                 "type": self.type,
