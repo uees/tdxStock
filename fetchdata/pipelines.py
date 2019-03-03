@@ -85,7 +85,9 @@ class ReportPipeline(object):
         """异步下载"""
         d = ensureDeferred(self.download_report(item))
 
-        d.addCallback(lambda: item)
+        # def success(item):
+        #    return item
+        # d.addCallback(success)
 
         return d
 
