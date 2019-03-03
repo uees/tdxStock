@@ -6,13 +6,15 @@
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import redis
 from scrapy.exceptions import DropItem
+from twisted.internet.defer import ensureDeferred
 
-from basedata.models import Stock, ReportType, Report, AccountingSubject, ReportItem
+from basedata.models import (AccountingSubject, Report, ReportItem, ReportType,
+                             Stock)
 from fetchdata.utils import parse_report_name
 
+from .spiders.report_spider import ReportSpider
 from .spiders.stock_detail import StockDetailSpider
 from .spiders.stock_list import StockSpider
-from .spiders.report_spider import ReportSpider
 
 
 class StockPipeline(object):
@@ -74,20 +76,27 @@ class ReportPipeline(object):
         # 这个方法必须返回一个 Item (或任何继承类)对象，
         # 或是抛出 DropItem 异常，被丢弃的item将不会被之后的pipeline组件所处理
         if isinstance(spider, ReportSpider):
-            self.download_report(item.copy())
-            return item
+            self.download(item)
 
         # 否则直接返回
         return item
 
-    def download_report(self, item):
+    def download(self, item):
+        """异步下载"""
+        d = ensureDeferred(self.download_report(item))
+
+        d.addCallback(lambda: item)
+
+        return d
+
+    async def download_report(self, item):
         report_year, report_quarter = parse_report_name(item['report_name'])
         if report_year is None or report_quarter is None:
             raise DropItem("无法解析的报告: %s %s" % (item['stock_name'], item['report_name']))
 
         report_type_id = self.get_report_type_id(item['report_type'])
         # 获取报告对象
-        report_id, report_created = self.check_report(
+        report, created = await self.check_report(
             stock_id=item['stock_id'],
             report_type_id=report_type_id,
             is_single_quarter=item.get('is_single_quarter'),
@@ -97,10 +106,13 @@ class ReportPipeline(object):
             report_date=item.get('report_date')
         )
 
-        if report_created or not ReportItem.objects.filter(report_id=report_id).exists():
+        await self.download_items(report, created, item)
+
+    async def download_items(self, report, created, item):
+        if created or not ReportItem.objects.filter(report=report).exists():
             items_to_insert = list()
             for slug, value in item['report_data'].items():
-                subject_id = self.get_subject_id(report_type_id, slug)
+                subject_id = self.get_subject_id(report.report_type_id, slug)
                 # 创建报告项目
                 if isinstance(value, list):
                     value = value[0]
@@ -111,7 +123,7 @@ class ReportPipeline(object):
                     value_type = 'STRING'
 
                 items_to_insert.append(ReportItem(
-                    report_id=report_id,
+                    report=report,
                     subject_id=subject_id,
                     value=value,
                     value_type=value_type
@@ -119,16 +131,9 @@ class ReportPipeline(object):
 
             ReportItem.objects.bulk_create(items_to_insert)
 
-    def check_report(self, stock_id, report_type_id, is_single_quarter, year, quarter, report_name, report_date):
+    async def check_report(self, stock_id, report_type_id, is_single_quarter, year, quarter, report_name, report_date):
         """检查是否已经下载, 去重"""
-        name = "basedata.report"
-        key = "stock_%s__type_%s__%s_%s__single_%s" % (stock_id, report_type_id, year, quarter, is_single_quarter)
-        created = False
-        if self.r.hexists(name, key):
-            return self.r.hget(name, key), created
-
-        # 获取报告对象
-        report, created = Report.objects.get_or_create(
+        return Report.objects.get_or_create(
             stock_id=stock_id,
             report_type_id=report_type_id,
             is_single_quarter=is_single_quarter,
@@ -139,9 +144,6 @@ class ReportPipeline(object):
                 'name': report_name,
             }
         )
-        self.r.hset(name, key, report.id)
-
-        return report.id, created
 
     def get_report_type_id(self, slug):
         """缓存获取 report_type_id"""

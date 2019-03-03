@@ -59,7 +59,7 @@ class ReportItem(models.Model):
         ('NUMBER', '数字'),
         ('STRING', '字符串'),
     ]
-    report = models.ForeignKey(Report, verbose_name='报表', on_delete=models.CASCADE)
+    report = models.ForeignKey(Report, verbose_name='报表', on_delete=models.CASCADE, db_index=True)
     subject = models.ForeignKey(AccountingSubject, on_delete=models.CASCADE)
     value = models.CharField('值', max_length=250, null=True, blank=True)
     value_type = models.CharField('值数据类型', choices=VALUE_TYPES, max_length=64, null=True, blank=True)
@@ -71,4 +71,3 @@ class ReportItem(models.Model):
     class Meta:
         verbose_name = '报表项'
         verbose_name_plural = verbose_name
-        unique_together = ["report", "subject"]
