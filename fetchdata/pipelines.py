@@ -127,14 +127,15 @@ class ReportPipeline(object):
                     value = value[0]
 
                 if isinstance(value, int) or isinstance(value, float):
-                    value_type = 'NUMBER'
+                    value_type = ReportItem.NUMBER_TYPE
                 else:
-                    value_type = 'STRING'
+                    value_type = ReportItem.STRING_TYPE
 
                 items_to_insert.append(ReportItem(
                     report=report,
                     subject=subject,
-                    value=value,
+                    value_number=value if value_type == ReportItem.NUMBER_TYPE else None,
+                    value=value if value_type == ReportItem.STRING_TYPE else None,
                     value_type=value_type
                 ))
 
