@@ -3,7 +3,7 @@ import json
 from urllib.parse import urlencode
 
 import scrapy
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from basedata.models import Stock
 from fetchdata import settings
@@ -39,7 +39,10 @@ class ReportSpider(scrapy.Spider):
     def start_requests(self):
         cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))
         # 获取还未有报告的股票
-        stocks = Stock.objects.annotate(Count('report')).filter(report__count=0).all()
+        stocks = Stock.objects.annotate(
+                reports_num=Count('report', filter=Q(report__report_type__slug=self.report_type))
+            ).filter(reports_num=0).all()
+
         for stock in stocks:
             params = {
                 "symbol": stock.code,
@@ -80,14 +83,17 @@ class ReportSpider(scrapy.Spider):
                     "is_single_quarter": self.is_single_quarter,
                 })
 
+        last_report_name = data.get('last_report_name')
+
+        if not last_report_name:
+            return
+
         # 上市日期
         listed_date = response.meta['stock'].listing_date
         if listed_date:
             listed_year = listed_date.year
         else:
             listed_year = 2008
-
-        last_report_name = data.get('last_report_name', '')
 
         last_report_year, last_report_quarter = parse_report_name(last_report_name)
         if last_report_year and last_report_quarter:
