@@ -55,18 +55,38 @@ class Report(models.Model):
 
 
 class ReportItem(models.Model):
+    """
+    报表项目
+    这个表中数据是千万级以上的, 能用数值存储尽量用数值类型
+    """
     VALUE_TYPES = [
-        ('NUMBER', '数字'),
-        ('STRING', '字符串'),
+        (1, '数值'),
+        (2, '字符串'),
+    ]
+    UNIT_TYPES = [
+        (1, '元'),
+        (2, '万元'),
+        (3, '亿'),
+        (4, '个'),
+        (5, '人'),
+        (6, '次'),
+        (7, '%'),
     ]
     report = models.ForeignKey(Report, verbose_name='报表', on_delete=models.CASCADE, db_index=True)
     subject = models.ForeignKey(AccountingSubject, on_delete=models.CASCADE)
-    value = models.CharField('值', max_length=250, null=True, blank=True)
-    value_type = models.CharField('值数据类型', choices=VALUE_TYPES, max_length=64, null=True, blank=True)
-    value_unit = models.CharField('数据单位', max_length=64, null=True, blank=True)
+    value_number = models.DecimalField('数值', max_digits=30, decimal_places=4, null=True, blank=True)
+    value = models.CharField('值', max_length=64, null=True, blank=True)
+    value_type = models.SmallIntegerField('值类型', choices=VALUE_TYPES, null=True, blank=True)
+    value_unit = models.SmallIntegerField('值单位', choices=UNIT_TYPES, null=True, blank=True)
 
     def __str__(self):
         return self.subject.name
+
+    def get_value(self):
+        if self.value_type == 1:
+            return self.value_number, self.value_type
+
+        return self.value, self.value_type
 
     class Meta:
         verbose_name = '报表项'

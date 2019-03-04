@@ -105,3 +105,27 @@ def parse_report_name(report_name):
         return report_year, report_quarter
 
     return None, None
+
+
+def is_number(value):
+    try:
+        value + 1
+    except TypeError:
+        return False
+    else:
+        return True
+
+
+def is_number_like(value):
+    try:
+        int(value)
+    except ValueError:
+        return False
+    else:
+        return True
+
+
+def str_fix_null(value):
+    if value is None:
+        value = ''
+    return value

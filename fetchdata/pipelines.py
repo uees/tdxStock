@@ -4,7 +4,6 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-import redis
 from scrapy.exceptions import DropItem
 from twisted.internet.defer import ensureDeferred
 
