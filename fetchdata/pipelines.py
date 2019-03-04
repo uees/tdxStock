@@ -122,7 +122,7 @@ class ReportPipeline(object):
             items_to_insert = list()
             for slug, value in item['report_data'].items():
                 subject = self.get_subject(report.report_type, slug)
-                # 创建报告项目
+
                 if isinstance(value, list):
                     value = value[0]
 
@@ -135,7 +135,7 @@ class ReportPipeline(object):
                     report=report,
                     subject=subject,
                     value_number=value if value_type == ReportItem.NUMBER_TYPE else None,
-                    value=value if value_type == ReportItem.STRING_TYPE else None,
+                    value=value if value_type != ReportItem.NUMBER_TYPE else None,
                     value_type=value_type
                 ))
 
