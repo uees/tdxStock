@@ -82,7 +82,7 @@ class ReportPipeline(object):
             report_name = str_fix_null(item['report_name'])
             report_year, report_quarter = parse_report_name(report_name)
             if report_year is None or report_quarter is None:
-                raise DropItem("Reports that cannot be parsed: %s %s" % (item['stock_name'], item['report_name']))
+                raise DropItem("Reports that cannot be parsed: %s(%s) %s" % (item['stock_name'], item['stock_code'], item['report_name']))
 
             ensureDeferred(self.download_report(item, report_year, report_quarter))
 
