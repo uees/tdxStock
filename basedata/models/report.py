@@ -131,7 +131,7 @@ class XReportItem(models.Model):
     这个表中数据是千万级以上的, 能用数值存储尽量用数值类型
     """
 
-    report = models.ForeignKey(Report, verbose_name='报表', on_delete=models.CASCADE, db_index=True)
+    report = models.ForeignKey(XReport, verbose_name='报表', on_delete=models.CASCADE, db_index=True)
     subject = models.ForeignKey(AccountingSubject, on_delete=models.CASCADE)
     value_number = models.DecimalField('数值', max_digits=30, decimal_places=4, null=True, blank=True)
     value = models.CharField('值', max_length=64, null=True, blank=True)

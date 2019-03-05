@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 from .models import (AccountingSubject, Concept, Industry, Report, ReportItem,
-                     ReportType, Section, Stock, Territory)
+                     ReportType, Section, Stock, Territory, XReport,
+                     XReportItem)
 
 
 @admin.register(Concept)
@@ -77,9 +78,20 @@ class ReportItemInline(admin.StackedInline):
     model = ReportItem
 
 
+class XReportItemInline(admin.StackedInline):
+    model = XReportItem
+
+
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ('stock_id', 'name', 'report_type_id', 'report_date', 'is_single_quarter')
+    list_display = ('stock_id', 'name', 'report_type_id', 'report_date')
+    list_display_links = ('name',)
+    list_per_page = 50
+
+
+@admin.register(XReport)
+class XReportAdmin(admin.ModelAdmin):
+    list_display = ('stock_id', 'name', 'report_type_id', 'report_date')
     list_display_links = ('name',)
     list_per_page = 50
 
