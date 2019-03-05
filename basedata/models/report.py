@@ -38,13 +38,13 @@ class AccountingSubject(models.Model):
 
 
 class Report(models.Model):
+    """仅存单季"""
     name = models.CharField('名称', max_length=128, null=True, blank=True)
     stock = models.ForeignKey('Stock', on_delete=models.CASCADE)
     report_type = models.ForeignKey(ReportType, on_delete=models.CASCADE)
     year = models.IntegerField('年度')
     quarter = models.IntegerField('季度')
     report_date = models.DateField('公布日期', null=True, blank=True)
-    is_single_quarter = models.BooleanField('是否单季报', default=True)
 
     def __str__(self):
         return self.name
@@ -52,12 +52,12 @@ class Report(models.Model):
     class Meta:
         verbose_name = '报表'
         verbose_name_plural = verbose_name
-        unique_together = ["stock", "report_type", 'is_single_quarter', 'year', 'quarter']
+        unique_together = ["stock", "report_type", 'year', 'quarter']
 
 
 class ReportItem(models.Model):
     """
-    报表项目
+    报表项目/仅存单季
     这个表中数据是千万级以上的, 能用数值存储尽量用数值类型
     """
     NUMBER_TYPE = 1
@@ -92,6 +92,51 @@ class ReportItem(models.Model):
     value = models.CharField('值', max_length=64, null=True, blank=True)
     value_type = models.SmallIntegerField('值类型', choices=VALUE_TYPES, null=True, blank=True)
     value_unit = models.SmallIntegerField('值单位', choices=UNIT_TYPES, null=True, blank=True)
+
+    def __str__(self):
+        return self.subject.name
+
+    def get_value(self):
+        if self.value_type == 1:
+            return self.value_number, self.value_type
+
+        return self.value, self.value_type
+
+    class Meta:
+        verbose_name = '报表项'
+        verbose_name_plural = verbose_name
+
+
+class XReport(models.Model):
+    """仅存报告期"""
+    name = models.CharField('名称', max_length=128, null=True, blank=True)
+    stock = models.ForeignKey('Stock', on_delete=models.CASCADE)
+    report_type = models.ForeignKey(ReportType, on_delete=models.CASCADE)
+    year = models.IntegerField('年度')
+    quarter = models.IntegerField('季度')
+    report_date = models.DateField('公布日期', null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = '报表'
+        verbose_name_plural = verbose_name
+        unique_together = ["stock", "report_type", 'year', 'quarter']
+
+
+class XReportItem(models.Model):
+    """
+    报表项目，仅存报告期
+    这个表中数据是千万级以上的, 能用数值存储尽量用数值类型
+    """
+
+    report = models.ForeignKey(Report, verbose_name='报表', on_delete=models.CASCADE, db_index=True)
+    subject = models.ForeignKey(AccountingSubject, on_delete=models.CASCADE)
+    value_number = models.DecimalField('数值', max_digits=30, decimal_places=4, null=True, blank=True)
+    value = models.CharField('值', max_length=64, null=True, blank=True)
+    value_type = models.SmallIntegerField('值类型', choices=ReportItem.VALUE_TYPES, null=True, blank=True)
+    value_unit = models.SmallIntegerField('值单位', choices=ReportItem.UNIT_TYPES, null=True, blank=True)
 
     def __str__(self):
         return self.subject.name
