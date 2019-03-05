@@ -20,7 +20,7 @@ async def _fix_item(item):
 
 async def fix_report_items(start, limit):
     items = ReportItem.objects.filter(
-            Q(value__isnull=False) & Q(pk__gt=start)
+            Q(value__isnull=False) & Q(value_number__isnull=True) & Q(pk__gt=start)
         ).all()[:limit]
     count = 0
     next_start = -1
@@ -38,11 +38,6 @@ async def fix_report_items(start, limit):
     await fix_report_items(next_start, limit)
 
 
-def stop():
-    reactor.callLater(4, reactor.stop)
-
-
 def run():
-    d = ensureDeferred(fix_report_items(0, 1000))
-    d.addCallback(stop)
+    ensureDeferred(fix_report_items(0, 1000))
     reactor.run()
