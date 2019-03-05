@@ -16,6 +16,7 @@ class ReportSpider(scrapy.Spider):
     name = 'report_spider'
     allowed_domains = ['xueqiu.com']
     api = "https://stock.xueqiu.com/v5/stock/finance/cn/{report}.json"
+    cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -37,11 +38,10 @@ class ReportSpider(scrapy.Spider):
             self.report_type = 'cash_flow_sheet'
 
     def start_requests(self):
-        cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))
-        # 获取还未有报告的股票
+        # 获取报表数<=4的股票
         stocks = Stock.objects.annotate(
                 reports_num=Count('report', filter=Q(report__report_type__slug=self.report_type))
-            ).filter(reports_num=0).all()
+            ).filter(reports_num__lte=4).all()
 
         for stock in stocks:
             params = {
@@ -58,7 +58,7 @@ class ReportSpider(scrapy.Spider):
             }
 
             url = "%s?%s" % (self.api.format(report=getattr(self, 'report')), urlencode(params))
-            yield scrapy.Request(url, self.parse, cookies=cookies, headers=headers, meta={
+            yield scrapy.Request(url, self.parse, cookies=self.cookies, headers=headers, meta={
                 "stock": stock,
             })
 
