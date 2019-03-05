@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 from scrapy.exceptions import DropItem
 from twisted.internet.defer import ensureDeferred
 
 from basedata.models import (AccountingSubject, Report, ReportItem, ReportType,
                              Stock)
-from fetchdata.utils import parse_report_name
+from fetchdata.utils import parse_report_name, str_fix_null
 
 from .spiders.report_spider import ReportSpider
 from .spiders.stock_detail import StockDetailSpider
@@ -83,36 +79,25 @@ class ReportPipeline(object):
         # 这个方法必须返回一个 Item (或任何继承类)对象，
         # 或是抛出 DropItem 异常，被丢弃的item将不会被之后的pipeline组件所处理
         if isinstance(spider, ReportSpider):
-            self.download(item)
+            report_name = str_fix_null(item['report_name'])
+            report_year, report_quarter = parse_report_name(report_name)
+            if report_year is None or report_quarter is None:
+                raise DropItem("Reports that cannot be parsed: %s(%s) %s" % (item['stock_name'], item['stock_code'], item['report_name']))
 
-        # 否则直接返回
+            ensureDeferred(self.download_report(item, report_year, report_quarter))
+
         return item
 
-    def download(self, item):
-        """异步下载"""
-        d = ensureDeferred(self.download_report(item))
-
-        # def success(item):
-        #    return item
-        # d.addCallback(success)
-
-        return d
-
-    async def download_report(self, item):
-        report_year, report_quarter = parse_report_name(item['report_name'])
-        if report_year is None or report_quarter is None:
-            raise DropItem("无法解析的报告: %s %s" % (item['stock_name'], item['report_name']))
-
+    async def download_report(self, item, report_year, report_quarter):
         report_type = self.get_report_type(item['report_type'])
-        # 获取报告对象
         report, created = await self.check_report(
             stock_id=item['stock_id'],
             report_type=report_type,
-            is_single_quarter=item.get('is_single_quarter'),
+            is_single_quarter=item['is_single_quarter'],
             year=report_year,
             quarter=report_quarter,
-            report_name=item.get('report_name'),
-            report_date=item.get('report_date')
+            report_name=item['report_name'],
+            report_date=item['report_date']
         )
 
         await self.download_items(report, created, item)
@@ -122,19 +107,20 @@ class ReportPipeline(object):
             items_to_insert = list()
             for slug, value in item['report_data'].items():
                 subject = self.get_subject(report.report_type, slug)
-                # 创建报告项目
+
                 if isinstance(value, list):
                     value = value[0]
 
                 if isinstance(value, int) or isinstance(value, float):
-                    value_type = 'NUMBER'
+                    value_type = ReportItem.NUMBER_TYPE
                 else:
-                    value_type = 'STRING'
+                    value_type = ReportItem.STRING_TYPE
 
                 items_to_insert.append(ReportItem(
                     report=report,
                     subject=subject,
-                    value=value,
+                    value_number=value if value_type == ReportItem.NUMBER_TYPE else None,
+                    value=value if value_type != ReportItem.NUMBER_TYPE else None,
                     value_type=value_type
                 ))
 

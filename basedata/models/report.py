@@ -8,6 +8,7 @@ class ReportType(models.Model):
         ('consolidated_balance_sheet', '资产负债表'),
         ('cash_flow_sheet', '现金流量表'),
     ]
+
     name = models.CharField('报表类型', max_length=200)
     slug = models.CharField(max_length=200, null=True, unique=True)
     memo = models.TextField('备注', null=True, blank=True)
@@ -59,19 +60,32 @@ class ReportItem(models.Model):
     报表项目
     这个表中数据是千万级以上的, 能用数值存储尽量用数值类型
     """
+    NUMBER_TYPE = 1
+    STRING_TYPE = 2
+
     VALUE_TYPES = [
-        (1, '数值'),
-        (2, '字符串'),
+        (NUMBER_TYPE, '数值'),
+        (STRING_TYPE, '字符串'),
     ]
+
+    YUAN = 1
+    WAN_YUAN = 2
+    YI = 3
+    GE = 4
+    REN = 5
+    CI = 6
+    RATE = 7
+
     UNIT_TYPES = [
-        (1, '元'),
-        (2, '万元'),
-        (3, '亿'),
-        (4, '个'),
-        (5, '人'),
-        (6, '次'),
-        (7, '%'),
+        (YUAN, '元'),
+        (WAN_YUAN, '万元'),
+        (YI, '亿'),
+        (GE, '个'),
+        (REN, '人'),
+        (CI, '次'),
+        (RATE, '%'),
     ]
+
     report = models.ForeignKey(Report, verbose_name='报表', on_delete=models.CASCADE, db_index=True)
     subject = models.ForeignKey(AccountingSubject, on_delete=models.CASCADE)
     value_number = models.DecimalField('数值', max_digits=30, decimal_places=4, null=True, blank=True)
