@@ -73,6 +73,15 @@ class AccountingSubjectAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
+class ReportItemInline(admin.StackedInline):
+    model = ReportItem
+
+
+@admin.register(Report)
+class ReportAdmin(admin.ModelAdmin):
+    list_display = ('stock_id', 'name', 'report_type_id', 'report_date', 'is_single_quarter')
+    list_display_links = ('name',)
+    list_per_page = 50
+
+
 admin.site.register(Territory)
-admin.site.register(Report)
-admin.site.register(ReportItem)
