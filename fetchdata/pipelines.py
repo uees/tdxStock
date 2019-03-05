@@ -4,7 +4,7 @@ from scrapy.exceptions import DropItem
 from twisted.internet.defer import ensureDeferred
 
 from basedata.models import (AccountingSubject, Report, ReportItem, ReportType,
-                             Stock)
+                             Stock, XReport, XReportItem)
 from fetchdata.utils import parse_report_name, str_fix_null
 
 from .spiders.report_spider import ReportSpider
@@ -84,6 +84,13 @@ class ReportPipeline(object):
             if report_year is None or report_quarter is None:
                 raise DropItem("Reports that cannot be parsed: %s(%s) %s" % (item['stock_name'], item['stock_code'], item['report_name']))
 
+            if item['is_single_quarter']:
+                self.reports_model = Report
+                self.report_items_model = ReportItem
+            else:
+                self.reports_model = XReport
+                self.report_items_model = XReportItem
+
             ensureDeferred(self.download_report(item, report_year, report_quarter))
 
         return item
@@ -93,7 +100,6 @@ class ReportPipeline(object):
         report, created = await self.check_report(
             stock_id=item['stock_id'],
             report_type=report_type,
-            is_single_quarter=item['is_single_quarter'],
             year=report_year,
             quarter=report_quarter,
             report_name=item['report_name'],
@@ -103,7 +109,7 @@ class ReportPipeline(object):
         await self.download_items(report, created, item)
 
     async def download_items(self, report, created, item):
-        if created or not ReportItem.objects.filter(report=report).exists():
+        if created or not self.report_items_model.objects.filter(report=report).exists():
             items_to_insert = list()
             for slug, value in item['report_data'].items():
                 subject = self.get_subject(report.report_type, slug)
@@ -116,7 +122,7 @@ class ReportPipeline(object):
                 else:
                     value_type = ReportItem.STRING_TYPE
 
-                items_to_insert.append(ReportItem(
+                items_to_insert.append(self.report_items_model(
                     report=report,
                     subject=subject,
                     value_number=value if value_type == ReportItem.NUMBER_TYPE else None,
@@ -124,14 +130,13 @@ class ReportPipeline(object):
                     value_type=value_type
                 ))
 
-            ReportItem.objects.bulk_create(items_to_insert)
+            self.report_items_model.objects.bulk_create(items_to_insert)
 
-    async def check_report(self, stock_id, report_type, is_single_quarter, year, quarter, report_name, report_date):
+    async def check_report(self, stock_id, report_type, year, quarter, report_name, report_date):
         """检查是否已经下载, 去重"""
-        return Report.objects.get_or_create(
+        return self.reports_model.objects.get_or_create(
             stock_id=stock_id,
             report_type=report_type,
-            is_single_quarter=is_single_quarter,
             year=year,
             quarter=quarter,
             defaults={
