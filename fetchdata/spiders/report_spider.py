@@ -21,6 +21,8 @@ class ReportSpider(scrapy.Spider):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # 单季参数  S0 S1 S2 S3 S4
+        # 报告期参数  all Q1 Q2 Q3 Q4
         if getattr(self, 'quarter') == 'S0':
             self.is_single_quarter = True
             self.type = 'S0'
@@ -39,9 +41,16 @@ class ReportSpider(scrapy.Spider):
 
     def start_requests(self):
         # 获取报表数<=4的股票
-        stocks = Stock.objects.annotate(
-                reports_num=Count('report', filter=Q(report__report_type__slug=self.report_type))
-            ).filter(reports_num__lte=4).all()
+        if self.is_single_quarter:
+            qs = Stock.objects.annotate(
+                    reports_num=Count('report', filter=Q(report__report_type__slug=self.report_type))
+                )
+        else:
+            qs = Stock.objects.annotate(
+                    reports_num=Count('xreport', filter=Q(xreport__report_type__slug=self.report_type))
+                )
+
+        stocks = qs.filter(reports_num__lte=4).all()
 
         for stock in stocks:
             params = {
