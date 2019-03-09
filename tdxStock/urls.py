@@ -17,14 +17,16 @@ from django.conf import settings
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.urls import path, include, re_path
+from django.views.generic.base import RedirectView
 
 admin.AdminSite.site_title = settings.SITE_NAME
 admin.AdminSite.site_header = '%s 管理' % settings.SITE_NAME
 
 urlpatterns = [
+    path('', RedirectView.as_view(url='/wiki/'), name='index'),
+    path('wiki/', include('wiki.urls')),
+    path('account/', include('account.urls')),
     path('admin/', admin.site.urls),
-    path('', include('account.urls')),
-    path('', include('wiki.urls')),
 ]
 
 if settings.DEBUG:

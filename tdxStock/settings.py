@@ -152,7 +152,7 @@ AUTHENTICATION_BACKENDS = ['account.user_login_backend.EmailOrUsernameModelBacke
 
 AUTH_USER_MODEL = 'account.User'
 
-LOGIN_URL = '/login/'
+LOGIN_URL = '/account/login/'
 LOGIN_REDIRECT_URL = '/'
 
 TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
