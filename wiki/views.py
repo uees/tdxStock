@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -59,6 +60,7 @@ class ConceptUpdateView(LoginRequiredMixin, UpdateView):
         return reverse('wiki:concept-detail', kwargs={'pk': self.object.id})
 
 
+@login_required
 def delete(request, concept_id):
     concept = get_object_or_404(Concept, pk=concept_id)
     concept.delete()
