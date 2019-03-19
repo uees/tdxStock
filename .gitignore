@@ -54,3 +54,4 @@ migrations/
 *.db
 .env
 .vscode
+.ipynb_checkpoints/
