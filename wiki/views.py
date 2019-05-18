@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -14,6 +15,17 @@ class ConceptListView(ListView):
     context_object_name = 'concept_list'
     paginate_by = settings.PAGINATE_BY
     model = Concept
+
+    def get_queryset(self):
+        q = self.request.GET.get('q')
+        if q:
+            query = Q()
+            for key in q.split():
+                query = query & (Q(name__icontains=key) | Q(description__icontains=key))
+
+            return Concept.objects.filter(query).all()
+
+        return super().get_queryset()
 
 
 class ConceptDetailView(DetailView):

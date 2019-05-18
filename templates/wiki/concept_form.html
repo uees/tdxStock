@@ -1,7 +1,7 @@
 {% extends '_layout/base.html' %}
 {% load static %}
 
-{% block title %}{% if object %}编辑{% else %}创建{% endif %}概念{% endblock %}
+{% block title %}{% if object %}编辑 - {{ object.name }}{% else %}创建概念{% endif %}{% endblock %}
 
 {% block header_css %}
     <link rel="stylesheet" href="{% static 'editor.md/css/editormd.min.css' %}"/>

@@ -8,6 +8,13 @@
             <h6 class="mb-0 text-white lh-100">{{ SITE_NAME }}</h6>
             <small>Since 2019</small>
         </div>
+
+        <div class="ml-auto">
+            <form class="form-inline mt-2 mt-md-0" action="{%  url 'wiki:concept-list' %}">
+                <input name="q" class="form-control mr-sm-2" type="text" aria-label="Search" value="{{ request.GET.q }}">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        </div>
     </div>
     <div class="my-3 p-3 bg-white rounded box-shadow">
         <h6 class="border-bottom border-gray pb-2 mb-0">概念</h6>
@@ -32,19 +39,23 @@
     </div>
 
     {% if is_paginated %}
-        <nav aria-label="Page navigation example">
+        <nav aria-label="navigation">
             <ul class="pagination">
-                {% if concept_list.has_previous %}
+                {% if page_obj.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ concept_list.previous_page_number }}">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
                             <span class="meta-nav">&laquo;</span> Previous
                         </a>
                     </li>
                 {% endif %}
-
-                {% if concept_list.has_next %}
+                <li class="page-item disabled">
+                    <span class="page-link">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                    </span>
+                </li>
+                {% if page_obj.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ concept_list.next_page_number }}">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
                             Next <span class="meta-nav">&raquo;</span>
                         </a>
                     </li>

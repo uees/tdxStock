@@ -7,11 +7,27 @@
 {% endblock %}
 
 {% block content %}
-    <div class="card" style="margin-top: 60px">
+    <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-purple rounded box-shadow">
+        <img class="mr-3" src="{% static 'img/logo.png' %}" alt="" width="48" height="48">
+        <div class="lh-100">
+            <h6 class="mb-0 text-white lh-100">{{ SITE_NAME }}</h6>
+            <small>Since 2019</small>
+        </div>
+
+        <div class="ml-auto">
+            <form class="form-inline mt-2 mt-md-0" action="{% url 'wiki:concept-list' %}">
+                <input name="q" class="form-control mr-sm-2" type="text" aria-label="Search"
+                       value="{{ request.GET.q }}">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
         <div class="card-header">
             {{ object.name }}
         </div>
-        <div class="card-body">
+        <div class="card-body markdown-body">
             {{ object.description_html|safe }}
         </div>
         <div class="card-footer bg-transparent border-success">

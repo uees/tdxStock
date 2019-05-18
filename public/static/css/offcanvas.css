@@ -8,7 +8,7 @@ body {
 }
 
 :root {
-  --jumbotron-padding-y: 3rem;
+    --jumbotron-padding-y: 3rem;
 }
 
 @media (max-width: 767.98px) {
