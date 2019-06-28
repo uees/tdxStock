@@ -60,15 +60,16 @@ DEFAULT_REQUEST_HEADERS = {
 
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
-# SPIDER_MIDDLEWARES = {
-#    'fetchdata.middlewares.FetchdataSpiderMiddleware': 543,
-# }
+SPIDER_MIDDLEWARES = {
+    # 'fetchdata.middlewares.FetchdataSpiderMiddleware': 543,
+    'fetchdata.middlewares.SeleniumMiddleware': 543,
+}
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
-# DOWNLOADER_MIDDLEWARES = {
-#    'fetchdata.middlewares.FetchdataDownloaderMiddleware': 543,
-# }
+DOWNLOADER_MIDDLEWARES = {
+    'fetchdata.middlewares.FetchdataDownloaderMiddleware': 543,
+}
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html

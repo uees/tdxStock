@@ -6,6 +6,9 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from scrapy.http import HtmlResponse
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 class FetchdataSpiderMiddleware(object):
@@ -101,3 +104,32 @@ class FetchdataDownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+
+class SeleniumMiddleware(object):
+
+    def process_request(self, request, spider):
+        """
+        :param request: Request对象
+        :param spider: Spider对象
+        :return: HtmlResponse
+        """
+        if spider.name == 'xueqiu_territory':
+            driver = spider.browser
+            driver.implicitly_wait(10)
+            try:
+                spider.browser.get(request.url)
+                element = driver.find_element_by_css_selector("div.nav-container > ul.second-nav > li:nth-child(3)")
+                action = ActionChains(driver)
+                action.move_to_element(element)
+
+                response = HtmlResponse(url=spider.browser.current_url,
+                                        body=spider.browser.page_source,
+                                        encoding="utf-8",
+                                        request=request)
+            except TimeoutException:
+                response = HtmlResponse(url=spider.browser.current_url,
+                                        status=408,
+                                        request=request)
+
+            return response
