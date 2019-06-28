@@ -97,13 +97,19 @@ WSGI_APPLICATION = 'tdxStock.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
-    # env.db() Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
-    'default': env.db().update({
-        'init_command': 'SET default_storage_engine=MyISAM',
-    }),
-    'extra': env.db('SQLITE_URL',
-                    default=os.path.join(BASE_DIR, 'db.sqlite3'),
-                    engine='django.db.backends.sqlite3'),
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': env('MYSQL_HOST', default='127.0.0.1'),
+        'PORT': env('MYSQL_PORT', default='3306'),
+        'NAME': env('MYSQL_NAME', default='dbname'),
+        'USER': env('MYSQL_USER', default='user'),
+        'PASSWORD': env('MYSQL_PASSWORD', default='pass'),
+        'default-character-set': 'utf8',
+        'OPTIONS': {
+            'init_command': 'SET default_storage_engine=MyISAM',
+            'charset': 'utf8mb4'
+        },
+    }
 }
 
 # Password validation
