@@ -97,7 +97,10 @@ WSGI_APPLICATION = 'tdxStock.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
-    'default': env.db(),  # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
+    # env.db() Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
+    'default': env.db().update({
+        'init_command': 'SET default_storage_engine=MyISAM',
+    }),
     'extra': env.db('SQLITE_URL',
                     default=os.path.join(BASE_DIR, 'db.sqlite3'),
                     engine='django.db.backends.sqlite3'),

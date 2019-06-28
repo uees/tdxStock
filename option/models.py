@@ -9,6 +9,7 @@ class Option(models.Model):
     enable = models.BooleanField(default=True)
 
     class Meta:
+        db_table = "options"
         verbose_name = '选项'
         verbose_name_plural = verbose_name
 

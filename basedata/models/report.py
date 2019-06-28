@@ -2,6 +2,7 @@ from django.db import models
 
 
 class ReportType(models.Model):
+    """报表类型"""
     REPORT_TYPES = [
         ('primary_indicator_sheet', '主要指标'),
         ('consolidated_income_sheet', '利润表'),
@@ -22,6 +23,7 @@ class ReportType(models.Model):
 
 
 class AccountingSubject(models.Model):
+    """会计科目"""
     report_type = models.ForeignKey(ReportType, verbose_name="报表类型", on_delete=models.CASCADE, null=True)
     name = models.CharField('科目名称', max_length=200, null=True, blank=True)
     slug = models.CharField(max_length=200, null=True, blank=True)
@@ -38,7 +40,7 @@ class AccountingSubject(models.Model):
 
 
 class Report(models.Model):
-    """仅存单季"""
+    """单季报表"""
     name = models.CharField('名称', max_length=128, null=True, blank=True)
     stock = models.ForeignKey('Stock', on_delete=models.CASCADE)
     report_type = models.ForeignKey(ReportType, on_delete=models.CASCADE)
@@ -50,14 +52,14 @@ class Report(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = '报表'
+        verbose_name = '单季度报表'
         verbose_name_plural = verbose_name
         unique_together = ["stock", "report_type", 'year', 'quarter']
 
 
 class ReportItem(models.Model):
     """
-    报表项目/仅存单季
+    单季报表项目
     这个表中数据是千万级以上的, 能用数值存储尽量用数值类型
     """
     NUMBER_TYPE = 1
@@ -103,12 +105,12 @@ class ReportItem(models.Model):
         return self.value, self.value_type
 
     class Meta:
-        verbose_name = '报表项'
+        verbose_name = '单季度报表项目'
         verbose_name_plural = verbose_name
 
 
 class XReport(models.Model):
-    """仅存报告期"""
+    """报告期报表"""
     name = models.CharField('名称', max_length=128, null=True, blank=True)
     stock = models.ForeignKey('Stock', on_delete=models.CASCADE)
     report_type = models.ForeignKey(ReportType, on_delete=models.CASCADE)
@@ -120,14 +122,14 @@ class XReport(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = '报表'
+        verbose_name = '报告期报表'
         verbose_name_plural = verbose_name
         unique_together = ["stock", "report_type", 'year', 'quarter']
 
 
 class XReportItem(models.Model):
     """
-    报表项目，仅存报告期
+    报告期报表项目
     这个表中数据是千万级以上的, 能用数值存储尽量用数值类型
     """
 
@@ -148,5 +150,5 @@ class XReportItem(models.Model):
         return self.value, self.value_type
 
     class Meta:
-        verbose_name = '报表项'
+        verbose_name = '报告期报表项目'
         verbose_name_plural = verbose_name
