@@ -1,8 +1,11 @@
 from django.db import models
 
+from tdxStock.fields import UnsignedAutoField
+
 
 class Stock(models.Model):
     """股票"""
+    id = UnsignedAutoField(primary_key=True)
     name = models.CharField('名称', max_length=64, db_index=True)
     code = models.CharField('代码', max_length=32, unique=True)
     exchange_code = models.CharField('交易市场', max_length=32, null=True, blank=True)  # 交易市场, 例如，XSHG-上海证券交易所；XSHE-深圳证券交易所

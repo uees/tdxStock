@@ -5,17 +5,12 @@ class Industry(models.Model):
     """行业"""
     parent = models.ForeignKey('self', verbose_name='父级行业', on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField('名称', max_length=200)
+    level = models.SmallIntegerField('级别', null=True, blank=True)  # 几级分类
     type = models.CharField('类型', max_length=64, default="证监会分类")  # 申万分类
     memo = models.TextField('备注', null=True, blank=True)
     stocks = models.ManyToManyField('Stock', through='IndustryStock')
 
     def __str__(self):
-        if self.parent:
-            if self.parent.parent:
-                return "%s -> %s -> %s" % (self.parent.parent.name, self.parent.name, self.name)
-
-            return "%s -> %s" % (self.parent.name, self.name)
-
         return self.name
 
     class Meta:

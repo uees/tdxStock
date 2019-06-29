@@ -1,5 +1,7 @@
 from django.db import models
 
+from tdxStock.fields import UnsignedAutoField, UnsignedBigAutoField
+
 
 class ReportType(models.Model):
     """报表类型"""
@@ -10,6 +12,7 @@ class ReportType(models.Model):
         ('cash_flow_sheet', '现金流量表'),
     ]
 
+    id = UnsignedAutoField(primary_key=True)
     name = models.CharField('报表类型', max_length=200)
     slug = models.CharField(max_length=200, null=True, unique=True)
     memo = models.TextField('备注', null=True, blank=True)
@@ -24,6 +27,7 @@ class ReportType(models.Model):
 
 class AccountingSubject(models.Model):
     """会计科目"""
+    id = UnsignedAutoField(primary_key=True)
     report_type = models.ForeignKey(ReportType, verbose_name="报表类型", on_delete=models.CASCADE, null=True)
     name = models.CharField('科目名称', max_length=200, null=True, blank=True)
     slug = models.CharField(max_length=200, null=True, blank=True)
@@ -41,6 +45,7 @@ class AccountingSubject(models.Model):
 
 class Report(models.Model):
     """单季报表"""
+    id = UnsignedAutoField(primary_key=True)
     name = models.CharField('名称', max_length=128, null=True, blank=True)
     stock = models.ForeignKey('Stock', on_delete=models.CASCADE)
     report_type = models.ForeignKey(ReportType, on_delete=models.CASCADE)
@@ -88,6 +93,7 @@ class ReportItem(models.Model):
         (RATE, '%'),
     ]
 
+    id = UnsignedBigAutoField(primary_key=True)
     report = models.ForeignKey(Report, verbose_name='报表', on_delete=models.CASCADE, db_index=True)
     subject = models.ForeignKey(AccountingSubject, on_delete=models.CASCADE)
     value_number = models.DecimalField('数值', max_digits=30, decimal_places=4, null=True, blank=True)
@@ -111,6 +117,7 @@ class ReportItem(models.Model):
 
 class XReport(models.Model):
     """报告期报表"""
+    id = UnsignedAutoField(primary_key=True)
     name = models.CharField('名称', max_length=128, null=True, blank=True)
     stock = models.ForeignKey('Stock', on_delete=models.CASCADE)
     report_type = models.ForeignKey(ReportType, on_delete=models.CASCADE)
@@ -133,6 +140,7 @@ class XReportItem(models.Model):
     这个表中数据是千万级以上的, 能用数值存储尽量用数值类型
     """
 
+    id = UnsignedBigAutoField(primary_key=True)
     report = models.ForeignKey(XReport, verbose_name='报表', on_delete=models.CASCADE, db_index=True)
     subject = models.ForeignKey(AccountingSubject, on_delete=models.CASCADE)
     value_number = models.DecimalField('数值', max_digits=30, decimal_places=4, null=True, blank=True)

@@ -17,7 +17,7 @@ class SectionAdmin(admin.ModelAdmin):
 
 @admin.register(Industry)
 class IndustryAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'memo')
+    list_display = ('type', 'level', 'name', 'memo')
     list_select_related = ('parent', 'parent__parent')
 
     def get_queryset(self, request):

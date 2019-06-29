@@ -1,11 +1,12 @@
 import json
 
-from django_extensions.db.fields.json import JSONField
+from django.db import models
+from django_extensions.db.fields.json import JSONField as JField
 
 from tdxStock.helpers import is_json_stringify
 
 
-class JSONField(JSONField):
+class JSONField(JField):
     """支持纯字符串的JSONField"""
 
     def get_db_prep_save(self, value, connection, **kwargs):
@@ -15,3 +16,20 @@ class JSONField(JSONField):
             value = json.dumps(value)
 
         return super().get_db_prep_save(value, connection, **kwargs)
+
+
+# MySQL unsigned integer (range 0 to 4294967295).
+class UnsignedAutoField(models.AutoField):
+    def db_type(self, connection):
+        return 'integer UNSIGNED AUTO_INCREMENT'
+
+    def rel_db_type(self, connection):
+        return 'integer UNSIGNED'
+
+
+class UnsignedBigAutoField(models.AutoField):
+    def db_type(self, connection):
+        return 'BIGINT UNSIGNED AUTO_INCREMENT'
+
+    def rel_db_type(self, connection):
+        return 'BIGINT UNSIGNED'

@@ -55,3 +55,5 @@ migrations/
 .env
 .vscode
 .ipynb_checkpoints/
+fixtures/basedata.json
+fixtures/account.json
