@@ -21,15 +21,20 @@ class IndustrySpiderSpider(scrapy.Spider):
         'Referer': 'http://quotes.money.163.com/old/',
     }
 
+    type = "证监会分类"
+
     def parse(self, response):
         # Spider must return Request, BaseItem, dict or None
         industry_sel = response.xpath('//*[@id="f0-f7"]')
 
         # 一级
-        top_item = IndustryItem()
-        top_item['name'] = industry_sel.xpath('a/text()').get()
-
-        first_industry, _ = Industry.objects.get_or_create(name=top_item['name'])
+        data = dict(
+            name=industry_sel.xpath('a/text()').get(),
+            type=self.type,
+            level=1
+        )
+        top_item = IndustryItem(**data)
+        first_industry, _ = Industry.objects.get_or_create(**data)
 
         yield top_item
 
@@ -38,10 +43,14 @@ class IndustrySpiderSpider(scrapy.Spider):
             second_item = IndustryItem()
             second_item['parent'] = top_item['name']
             second_item['name'] = second_sel.xpath('a/text()').get()
+            second_item['level'] = 2
+            second_item['type'] = self.type
 
             second_industry, _ = Industry.objects.get_or_create(
                 name=second_item['name'],
-                parent=first_industry
+                parent=first_industry,
+                type=self.type,
+                level=second_item['level']
             )
 
             yield second_item
@@ -51,10 +60,14 @@ class IndustrySpiderSpider(scrapy.Spider):
                 third_item = IndustryItem()
                 third_item['parent'] = second_item['name']
                 third_item['name'] = third_sel.xpath('a/text()').get()
+                second_item['level'] = 3
+                second_item['type'] = self.type
 
                 third_industry, _ = Industry.objects.get_or_create(
                     name=third_item['name'],
-                    parent=second_industry
+                    parent=second_industry,
+                    type=self.type,
+                    level=second_item['level']
                 )
 
                 yield third_item
@@ -75,26 +88,28 @@ class IndustrySpiderSpider(scrapy.Spider):
                 }
 
                 url = "%s?%s" % (self.api, urlencode(params))
+
+                # meta 传 industry_id 唯一字段
                 yield scrapy.Request(url, headers=self.headers, callback=self.parse_stocks,
-                                     meta={"industry": third_item['name']})
+                                     meta={"industry_id": third_industry.id})
 
     def parse_stocks(self, response):
         body = json.loads(response.body)
 
+        industry = Industry.objects.filter(id=response.meta['industry_id']).first()
+
         stock_list = body.get('list', [])
         for stock in stock_list:
             item = StockItem()
-            item['industry'] = response.meta['industry']
             item['name'] = stock.get('SNAME')
             item['code'] = stock.get('SYMBOL')
 
-            stock_obj = Stock.objects.filter(code__endswith=item['code']).first()
-            industry_obj = Industry.objects.filter(name=item['industry']).first()
+            stock = Stock.objects.filter(code__endswith=item['code']).first()
 
-            if stock_obj and industry_obj:
+            if stock and industry:
                 IndustryStock.objects.get_or_create(
-                    stock=stock_obj,
-                    industry=industry_obj
+                    stock=stock,
+                    industry=industry
                 )
 
             yield item
@@ -106,5 +121,6 @@ class IndustrySpiderSpider(scrapy.Spider):
                 params.update({"page": page})
 
                 url = "%s?%s" % (self.api, urlencode(params))
+                # scrapy.Request 对网址会自动去重
                 yield scrapy.Request(url, headers=self.headers, callback=self.parse_stocks,
-                                     meta={"industry": response.meta['industry']})
+                                     meta={"industry_id": response.meta['industry_id']})

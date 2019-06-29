@@ -1,5 +1,4 @@
-from twisted.internet import reactor
-from twisted.internet.defer import ensureDeferred
+from twisted.internet import defer
 from django.db.models import Q
 
 from basedata.models import ReportItem
@@ -39,5 +38,7 @@ async def fix_report_items(start, limit):
 
 
 def run():
-    ensureDeferred(fix_report_items(0, 1000))
+    from twisted.internet import reactor
+
+    defer.ensureDeferred(fix_report_items(0, 1000))
     reactor.run()
