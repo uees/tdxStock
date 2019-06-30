@@ -9,6 +9,15 @@ from tdxStock.helpers import is_json_stringify
 class JSONField(JField):
     """支持纯字符串的JSONField"""
 
+    def to_python(self, value):
+        """Convert our string value to JSON after we load it from the DB"""
+        try:
+            res = super().to_python(value)
+        except json.decoder.JSONDecodeError:
+            res = value
+
+        return res
+
     def get_db_prep_save(self, value, connection, **kwargs):
         """Convert our JSON object to a string before we save"""
 

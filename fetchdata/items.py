@@ -9,6 +9,7 @@ import scrapy
 
 
 class StockItem(scrapy.Item):
+    """股票"""
     name = scrapy.Field()
     code = scrapy.Field()
     exchange_code = scrapy.Field()
@@ -52,6 +53,8 @@ class IndustryItem(scrapy.Item):
     """行业"""
     parent = scrapy.Field()
     name = scrapy.Field()
+    level = scrapy.Field()
+    type = scrapy.Field()
     memo = scrapy.Field()
 
 
