@@ -53,7 +53,7 @@ class StockSpider(scrapy.Spider):
 
         params = get_params(response)
         page = int(params['page'])
-        per_page = int(params['per_page'])
+        per_page = int(params['size'])
 
         if page * per_page < count:
             yield self.stock_list_request(page + 1, per_page)

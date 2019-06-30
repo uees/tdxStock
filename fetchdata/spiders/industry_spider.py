@@ -6,7 +6,7 @@ import scrapy
 
 from basedata.models.category import Industry, IndustryStock
 from basedata.models.stock import Stock
-from fetchdata.items import IndustryItem, StockItem
+from fetchdata.items import StockItem
 from fetchdata.utils import get_params, string2dict
 
 
@@ -23,6 +23,17 @@ class IndustrySpiderSpider(scrapy.Spider):
 
     type = "证监会分类"
 
+    def stock_list_request(self, industry_id, params):
+        url = "%s?%s" % (self.api, urlencode(params))
+
+        # meta 传 industry_id 唯一字段
+        return scrapy.Request(
+            url,
+            headers=self.headers,
+            callback=self.parse_stocks,
+            meta={"industry_id": industry_id}
+        )
+
     def parse(self, response):
         # Spider must return Request, BaseItem, dict or None
         industry_sel = response.xpath('//*[@id="f0-f7"]')
@@ -33,49 +44,33 @@ class IndustrySpiderSpider(scrapy.Spider):
             type=self.type,
             level=1
         )
-        top_item = IndustryItem(**data)
-        first_industry, _ = Industry.objects.get_or_create(**data)
 
-        yield top_item
+        # 行业表数据的创建会阻塞，因数据量少可以接受阻塞
+        first_industry, _ = Industry.objects.get_or_create(**data)
 
         # 二级
         for second_sel in industry_sel.xpath('ul/li'):
-            second_item = IndustryItem()
-            second_item['parent'] = top_item['name']
-            second_item['name'] = second_sel.xpath('a/text()').get()
-            second_item['level'] = 2
-            second_item['type'] = self.type
-
             second_industry, _ = Industry.objects.get_or_create(
-                name=second_item['name'],
+                name=second_sel.xpath('a/text()').get(),
                 parent=first_industry,
                 type=self.type,
-                level=second_item['level']
+                level=2
             )
-
-            yield second_item
 
             # 三级
             for third_sel in second_sel.xpath('ul/li'):
-                third_item = IndustryItem()
-                third_item['parent'] = second_item['name']
-                third_item['name'] = third_sel.xpath('a/text()').get()
-                second_item['level'] = 3
-                second_item['type'] = self.type
-
                 third_industry, _ = Industry.objects.get_or_create(
-                    name=third_item['name'],
+                    name=third_sel.xpath('a/text()').get(),
                     parent=second_industry,
                     type=self.type,
-                    level=second_item['level']
+                    level=3
                 )
 
-                yield third_item
-
                 qcond = third_sel.xpath('./@qcond').get()
+                qcond = string2dict(qcond, eq=':')
+
                 qquery = third_sel.xpath('./@qquery').get()
 
-                qcond = string2dict(qcond, eq=':')
                 params = {
                     "type": "query",
                     "fields": "NO,SYMBOL,NAME,PRICE,PERCENT,UPDOWN,FIVE_MINUTE,OPEN,YESTCLOSE,HIGH,LOW,VOLUME,TURNOVER,HS,LB,WB,ZF,PE,MCAP,TCAP,MFSUM,MFRATIO.MFRATIO2,MFRATIO.MFRATIO10,SNAME,CODE,ANNOUNMT,UVSNEWS",
@@ -87,40 +82,22 @@ class IndustrySpiderSpider(scrapy.Spider):
                     "count": qcond['count'],
                 }
 
-                url = "%s?%s" % (self.api, urlencode(params))
-
-                # meta 传 industry_id 唯一字段
-                yield scrapy.Request(url, headers=self.headers, callback=self.parse_stocks,
-                                     meta={"industry_id": third_industry.id})
+                yield self.stock_list_request(third_industry.id, params)
 
     def parse_stocks(self, response):
         body = json.loads(response.body)
 
-        industry = Industry.objects.filter(id=response.meta['industry_id']).first()
-
         stock_list = body.get('list', [])
         for stock in stock_list:
-            item = StockItem()
-            item['name'] = stock.get('SNAME')
-            item['code'] = stock.get('SYMBOL')
-
-            stock = Stock.objects.filter(code__endswith=item['code']).first()
-
-            if stock and industry:
-                IndustryStock.objects.get_or_create(
-                    stock=stock,
-                    industry=industry
-                )
-
-            yield item
+            yield dict(
+                name=stock.get('SNAME'),
+                code=stock.get('SYMBOL'),
+                industry_id=response.meta['industry_id']
+            )
 
         params = get_params(response)
-        pagecount = body.get('pagecount')
-        if pagecount > 1:
-            for page in range(1, pagecount):
-                params.update({"page": page})
-
-                url = "%s?%s" % (self.api, urlencode(params))
-                # scrapy.Request 对网址会自动去重
-                yield scrapy.Request(url, headers=self.headers, callback=self.parse_stocks,
-                                     meta={"industry_id": response.meta['industry_id']})
+        pagecount = int(body.get('pagecount'))
+        page = int(params['page'])
+        if pagecount > page:
+            params.update({"page": page + 1})
+            yield self.stock_list_request(response.meta['industry_id'], params)

@@ -1,44 +1,67 @@
 # -*- coding: utf-8 -*-
 
 from scrapy.exceptions import DropItem
-from twisted.internet.defer import ensureDeferred
+from twisted.internet import defer, reactor
 
 from basedata.models import (AccountingSubject, Report, ReportItem, ReportType,
                              Stock, XReport, XReportItem)
 from fetchdata.utils import parse_report_name, str_fix_null
 
-from .spiders.report_spider import ReportSpider
-from .spiders.stock_detail import StockDetailSpider
-from .spiders.stock_list import StockSpider
-
 
 class StockPipeline(object):
+    """下载股票到数据库"""
     def __init__(self):
         self.codes = {}
         for stock in Stock.objects.only('code', 'name').all():
             self.codes[stock.code] = stock.name
 
     def process_item(self, item, spider):
-        if isinstance(spider, StockSpider):
+        if spider.name == "stock_list":
             if item['code'] in self.codes:
                 if item['name'] == self.codes[item['code']]:
                     # 去重
                     raise DropItem("Duplicate item found: %s" % item)
-                else:
-                    # 要更新
-                    self.codes.update({item['code']: item['name']})
+
+                # else 要更新
+                self.codes.update({item['code']: item['name']})
+
+                def update_stock():
                     Stock.objects.filter(code=item['code']).update(name=item['name'])
-                    return item
+
+                reactor.callInThread(update_stock)
             else:
                 # 新增的
                 self.codes.update({item['code']: item['name']})
-                Stock.objects.create(**dict(item))
-                return item
 
-        elif isinstance(spider, StockDetailSpider):
-            del item['name']
-            Stock.objects.filter(code=item['code']).update(**dict(item))
-            return item
+                def create_stock():
+                    Stock.objects.create(**dict(item))
+
+                reactor.callInThread(create_stock)
+
+        elif spider.name == "stock_detail":
+            def update_stock():
+                del item['name']
+                Stock.objects.filter(code=item['code']).update(**dict(item))
+
+            reactor.callInThread(update_stock)
+
+        return item
+
+
+class IndustryPipeline(object):
+
+    def process_item(self, item, spider):
+        if spider.name == "industry_spider" or spider.name == "xueqiu_territory":
+            # item is dict(name, code, industry_id)
+
+            # stock = Stock.objects.filter(code__endswith=item['code']).first()
+
+            # if stock and industry:
+            #    IndustryStock.objects.get_or_create(
+            #        stock=stock,
+            #        industry=industry
+            #    )
+            pass
 
         return item
 
@@ -78,7 +101,7 @@ class ReportPipeline(object):
     def process_item(self, item, spider):
         # 这个方法必须返回一个 Item (或任何继承类)对象，
         # 或是抛出 DropItem 异常，被丢弃的item将不会被之后的pipeline组件所处理
-        if isinstance(spider, ReportSpider):
+        if spider.name == "report_spider":
             report_name = str_fix_null(item['report_name'])
             report_year, report_quarter = parse_report_name(report_name)
             if report_year is None or report_quarter is None:
@@ -91,7 +114,7 @@ class ReportPipeline(object):
                 self.reports_model = XReport
                 self.report_items_model = XReportItem
 
-            ensureDeferred(self.download_report(item, report_year, report_quarter))
+            defer.ensureDeferred(self.download_report(item, report_year, report_quarter))
 
         return item
 
