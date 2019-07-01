@@ -38,7 +38,8 @@ class Stock(models.Model):
     registered_address = models.CharField('注册地址', max_length=250, null=True, blank=True)
     office_address = models.CharField('办公地址', max_length=250, null=True, blank=True)
     updated_at = models.DateTimeField('更新时间', auto_now=True, null=True, editable=False)
-    last_report = models.CharField('最后报告期', max_length=64, null=True, blank=True)
+    last_report_date = models.DateField('最后报告日期（单单季）', null=True, blank=True, editable=False)
+    last_all_report_date = models.DateField('最后报告日期（报告期）', null=True, blank=True, editable=False)
 
     territory = models.ForeignKey('Territory', verbose_name='地域', null=True, blank=True,
                                   on_delete=models.SET_NULL)

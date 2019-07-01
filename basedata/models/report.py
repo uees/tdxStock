@@ -63,6 +63,7 @@ class Report(models.Model):
 
 
 class ReportItem(models.Model):
+    # todo 分表
     """
     单季报表项目
     这个表中数据是千万级以上的, 能用数值存储尽量用数值类型

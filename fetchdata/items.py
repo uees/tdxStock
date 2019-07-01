@@ -82,4 +82,6 @@ class ReportItem(scrapy.Item):
     report_name = scrapy.Field()
     report_data = scrapy.Field()
     report_type = scrapy.Field()
+    report_year = scrapy.Field()
+    report_quarter = scrapy.Field()
     is_single_quarter = scrapy.Field()

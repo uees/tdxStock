@@ -13,19 +13,22 @@ class StockDetailSpider(scrapy.Spider):
     name = 'stock_detail'
     allowed_domains = ['xueqiu.com']
 
+    cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))
+    api = "https://stock.xueqiu.com/v5/stock/f10/cn/company.json"
+    referer = "https://xueqiu.com/snowman/S/{code}/detail"
+
     def start_requests(self):
-        cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))
         # for stock in Stock.objects.only('name', 'code').all():
         for stock in Stock.objects.filter(company_name__isnull=True).only('name', 'code').all():
             headers = {
                 'X-Requested-With': 'XMLHttpRequest',
-                'Referer': settings.env('STOCK_DETAIL_API_REFERER').format(code=stock.code),
+                'Referer': self.referer.format(code=stock.code),
             }
 
             params = {"symbol": stock.code}
-            url = "%s?%s" % (settings.env('STOCK_DETAIL_API'), urlencode(params))
+            url = "%s?%s" % (self.api, urlencode(params))
 
-            yield scrapy.Request(url, cookies=cookies,
+            yield scrapy.Request(url, cookies=self.cookies,
                                  headers=headers,
                                  meta={"stock_code": stock.code})
 

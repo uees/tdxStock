@@ -6,7 +6,6 @@ from twisted.internet import defer, reactor
 from basedata.models import (AccountingSubject, Report, ReportItem, ReportType,
                              Stock, XReport, XReportItem, Industry, IndustryStock,
                              Concept, ConceptStock, Territory)
-from fetchdata.utils import parse_report_name, str_fix_null
 
 
 class StockPipeline(object):
@@ -64,6 +63,7 @@ class IndustryPipeline(object):
                         stock=stock,
                         industry=industry
                     )
+
             defer.ensureDeferred(process_industry_stock())
         else:
             return item
@@ -82,6 +82,7 @@ class ConceptPipeline(object):
                         stock=stock,
                         concept=concept
                     )
+
             defer.ensureDeferred(process_concept_stock())
         else:
             return item
@@ -98,6 +99,7 @@ class TerritoryPipeline(object):
                     Stock.objects.filter(code__endswith=item['code']).update(
                         territory=territory
                     )
+
             defer.ensureDeferred(process_territory_stock())
         else:
             return item
@@ -109,8 +111,23 @@ class ReportPipeline(object):
     def __init__(self):
         self.report_types = {}
         self.subjects = {}
+        self.reports_model = None
+        self.report_items_model = None
 
-    def get_report_type(self, slug):
+    def process_item(self, item, spider):
+        if spider.name in ["report", "stock_report"]:
+            if item['is_single_quarter']:
+                self.reports_model = Report
+                self.report_items_model = ReportItem
+            else:
+                self.reports_model = XReport
+                self.report_items_model = XReportItem
+
+            defer.ensureDeferred(self.download_report(item))
+        else:
+            return item
+
+    async def get_report_type(self, slug):
         """优先从缓存获取 report_type"""
         report_type = self.report_types.get(slug)
         if report_type is None:
@@ -119,7 +136,7 @@ class ReportPipeline(object):
 
         return report_type
 
-    def get_subject(self, report_type, slug):
+    async def get_subject(self, report_type, slug):
         """优先从缓存获取 subject"""
         key = "type_%s__%s" % (report_type.id, slug)
         subject = self.subjects.get(key)
@@ -135,45 +152,29 @@ class ReportPipeline(object):
 
         return subject
 
-    def process_item(self, item, spider):
-        # 这个方法必须返回一个 Item (或任何继承类)对象，
-        # 或是抛出 DropItem 异常，被丢弃的item将不会被之后的pipeline组件所处理
-        if spider.name == "report":
-            report_name = str_fix_null(item['report_name'])
-            report_year, report_quarter = parse_report_name(report_name)
-            if report_year is None or report_quarter is None:
-                raise DropItem("Reports that cannot be parsed: %s(%s) %s" % (
-                    item['stock_name'], item['stock_code'], item['report_name']))
-
-            if item['is_single_quarter']:
-                self.reports_model = Report
-                self.report_items_model = ReportItem
-            else:
-                self.reports_model = XReport
-                self.report_items_model = XReportItem
-
-            defer.ensureDeferred(self.download_report(item, report_year, report_quarter))
-        else:
-            return item
-
-    async def download_report(self, item, report_year, report_quarter):
-        report_type = self.get_report_type(item['report_type'])
-        report, created = await self.check_report(
+    async def download_report(self, item):
+        report_type = await self.get_report_type(item['report_type'])
+        report, created = await self.get_or_create_report(
             stock_id=item['stock_id'],
             report_type=report_type,
-            year=report_year,
-            quarter=report_quarter,
-            report_name=item['report_name'],
-            report_date=item['report_date']
+            year=item['report_year'],
+            quarter=item['report_quarter'],
+            defaults={
+                'report_date': item['report_date'],
+                'name': item['report_name'],
+            }
         )
 
-        await self.download_items(report, created, item)
+        await self.download_report_items(report, created, item)
 
-    async def download_items(self, report, created, item):
-        if created or not self.report_items_model.objects.filter(report=report).exists():
+    async def download_report_items(self, report, created, item):
+        async def has_items():
+            return self.report_items_model.objects.filter(report=report).exists()
+
+        if created or not await has_items():
             items_to_insert = list()
             for slug, value in item['report_data'].items():
-                subject = self.get_subject(report.report_type, slug)
+                subject = await self.get_subject(report.report_type, slug)
 
                 if isinstance(value, list):
                     value = value[0]
@@ -193,15 +194,6 @@ class ReportPipeline(object):
 
             self.report_items_model.objects.bulk_create(items_to_insert)
 
-    async def check_report(self, stock_id, report_type, year, quarter, report_name, report_date):
+    async def get_or_create_report(self, *args, **kwargs):
         """检查是否已经下载, 去重"""
-        return self.reports_model.objects.get_or_create(
-            stock_id=stock_id,
-            report_type=report_type,
-            year=year,
-            quarter=quarter,
-            defaults={
-                'report_date': report_date,
-                'name': report_name,
-            }
-        )
+        return self.reports_model.objects.get_or_create(*args, **kwargs)
