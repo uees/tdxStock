@@ -6,6 +6,7 @@ from twisted.internet import defer, reactor
 from basedata.models import (AccountingSubject, Report, ReportItem, ReportType,
                              Stock, XReport, XReportItem, Industry, IndustryStock,
                              Concept, ConceptStock, Territory)
+from tdxStock.abstract_models import DynamicModel
 
 
 class StockPipeline(object):
@@ -115,13 +116,13 @@ class ReportPipeline(object):
         self.report_items_model = None
 
     def process_item(self, item, spider):
-        if spider.name in ["report", "stock_report"]:
+        if spider.name == "report":
             if item['is_single_quarter']:
                 self.reports_model = Report
-                self.report_items_model = ReportItem
+                self.report_items_model = DynamicModel(ReportItem, item['report_quarter'])
             else:
                 self.reports_model = XReport
-                self.report_items_model = XReportItem
+                self.report_items_model = DynamicModel(XReportItem, item['report_quarter'])
 
             defer.ensureDeferred(self.download_report(item))
         else:

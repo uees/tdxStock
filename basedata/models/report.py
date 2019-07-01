@@ -161,3 +161,23 @@ class XReportItem(models.Model):
     class Meta:
         verbose_name = '报告期报表项目'
         verbose_name_plural = verbose_name
+
+# INSERT into `basedata_reportitem_2008`(
+# `value`, `value_number`, `value_type`,
+# `value_unit`, `report_id`, `subject_id`
+# ) SELECT
+# `basedata_reportitem`.`value`, `basedata_reportitem`.`value_number`, `basedata_reportitem`.`value_type`,
+# `basedata_reportitem`.`value_unit`, `basedata_reportitem`.`report_id`, `basedata_reportitem`.`subject_id`
+# FROM `basedata_reportitem`
+# left join `basedata_report` on `basedata_reportitem`.`report_id` = `basedata_report`.`id`
+# where `basedata_report`.`year` = 2008;
+
+# INSERT into `basedata_xreportitem_2008`(
+# `value`, `value_number`, `value_type`,
+# `value_unit`, `report_id`, `subject_id`
+# ) SELECT
+# `basedata_xreportitem`.`value`, `basedata_xreportitem`.`value_number`, `basedata_xreportitem`.`value_type`,
+# `basedata_xreportitem`.`value_unit`, `basedata_xreportitem`.`report_id`, `basedata_xreportitem`.`subject_id`
+# FROM `basedata_xreportitem`
+# left join `basedata_xreport` on `basedata_xreportitem`.`report_id` = `basedata_xreport`.`id`
+# where `basedata_xreport`.`year` = 2008;
