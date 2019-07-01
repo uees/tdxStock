@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 from urllib.parse import urlencode
 
@@ -13,7 +12,7 @@ from fetchdata.utils import (fromtimestamp, get_params, get_quarter_date,
 
 
 class ReportSpider(scrapy.Spider):
-    name = 'report_spider'
+    name = 'report'
     allowed_domains = ['xueqiu.com']
     api = "https://stock.xueqiu.com/v5/stock/finance/cn/{report}.json"
     cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))

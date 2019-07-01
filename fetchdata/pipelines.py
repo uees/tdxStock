@@ -4,7 +4,8 @@ from scrapy.exceptions import DropItem
 from twisted.internet import defer, reactor
 
 from basedata.models import (AccountingSubject, Report, ReportItem, ReportType,
-                             Stock, XReport, XReportItem, Industry, IndustryStock)
+                             Stock, XReport, XReportItem, Industry, IndustryStock,
+                             Concept, ConceptStock, Territory)
 from fetchdata.utils import parse_report_name, str_fix_null
 
 
@@ -68,6 +69,40 @@ class IndustryPipeline(object):
             return item
 
 
+class ConceptPipeline(object):
+
+    def process_item(self, item, spider):
+        if spider.name in ("concept",):
+            # item is dict(name, code, concept_id)
+            async def process_concept_stock():
+                concept = Concept.objects.filter(pk=item['concept_id']).first()
+                stock = Stock.objects.filter(code__endswith=item['code']).first()
+                if stock and concept:
+                    ConceptStock.objects.get_or_create(
+                        stock=stock,
+                        concept=concept
+                    )
+            defer.ensureDeferred(process_concept_stock())
+        else:
+            return item
+
+
+class TerritoryPipeline(object):
+
+    def process_item(self, item, spider):
+        if spider.name == "territory":
+            # item is dict(name, code, territory_id)
+            async def process_territory_stock():
+                territory = Territory.objects.filter(pk=item['territory_id']).first()
+                if territory:
+                    Stock.objects.filter(code__endswith=item['code']).update(
+                        territory=territory
+                    )
+            defer.ensureDeferred(process_territory_stock())
+        else:
+            return item
+
+
 class ReportPipeline(object):
     """处理Report的下载"""
 
@@ -103,7 +138,7 @@ class ReportPipeline(object):
     def process_item(self, item, spider):
         # 这个方法必须返回一个 Item (或任何继承类)对象，
         # 或是抛出 DropItem 异常，被丢弃的item将不会被之后的pipeline组件所处理
-        if spider.name == "report_spider":
+        if spider.name == "report":
             report_name = str_fix_null(item['report_name'])
             report_year, report_quarter = parse_report_name(report_name)
             if report_year is None or report_quarter is None:

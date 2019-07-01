@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# see: https://doc.scrapy.org/en/latest/topics/practices.html
 from urllib.parse import urlencode
 
 import scrapy
@@ -7,11 +5,11 @@ import scrapy
 from basedata.models import Stock
 from fetchdata import settings
 
-from .report_spider import ReportSpider
+from .report import ReportSpider
 
 
 class SingleReportSpider(ReportSpider):
-    name = 'single_report_spider'
+    name = 'single_report'
 
     def __init__(self, code, *args, **kwargs):
         super().__init__(*args, **kwargs)

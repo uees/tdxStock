@@ -82,6 +82,8 @@ DOWNLOADER_MIDDLEWARES = {
 ITEM_PIPELINES = {
     'fetchdata.pipelines.StockPipeline': 300,
     'fetchdata.pipelines.IndustryPipeline': 300,
+    'fetchdata.pipelines.ConceptPipeline': 300,
+    'fetchdata.pipelines.TerritoryPipeline': 300,
     'fetchdata.pipelines.ReportPipeline': 300,
 }
 
