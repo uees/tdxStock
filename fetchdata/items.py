@@ -44,9 +44,6 @@ class StockItem(scrapy.Item):
     updated_at = scrapy.Field()
     last_report = scrapy.Field()
     territory = scrapy.Field()
-    industry = scrapy.Field()
-    concept = scrapy.Field()
-    section = scrapy.Field()
 
 
 class IndustryItem(scrapy.Item):

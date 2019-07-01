@@ -4,12 +4,13 @@ from scrapy.exceptions import DropItem
 from twisted.internet import defer, reactor
 
 from basedata.models import (AccountingSubject, Report, ReportItem, ReportType,
-                             Stock, XReport, XReportItem)
+                             Stock, XReport, XReportItem, Industry, IndustryStock)
 from fetchdata.utils import parse_report_name, str_fix_null
 
 
 class StockPipeline(object):
     """下载股票到数据库"""
+
     def __init__(self):
         self.codes = {}
         for stock in Stock.objects.only('code', 'name').all():
@@ -45,25 +46,26 @@ class StockPipeline(object):
 
             reactor.callInThread(update_stock)
 
-        return item
+        else:
+            return item
 
 
 class IndustryPipeline(object):
 
     def process_item(self, item, spider):
-        if spider.name == "industry_spider" or spider.name == "xueqiu_territory":
+        if spider.name in ("industry_zjh", "industry_sw"):
             # item is dict(name, code, industry_id)
-
-            # stock = Stock.objects.filter(code__endswith=item['code']).first()
-
-            # if stock and industry:
-            #    IndustryStock.objects.get_or_create(
-            #        stock=stock,
-            #        industry=industry
-            #    )
-            pass
-
-        return item
+            async def process_industry_stock():
+                industry = Industry.objects.filter(pk=item['industry_id']).first()
+                stock = Stock.objects.filter(code__endswith=item['code']).first()
+                if stock and industry:
+                    IndustryStock.objects.get_or_create(
+                        stock=stock,
+                        industry=industry
+                    )
+            defer.ensureDeferred(process_industry_stock())
+        else:
+            return item
 
 
 class ReportPipeline(object):
@@ -105,7 +107,8 @@ class ReportPipeline(object):
             report_name = str_fix_null(item['report_name'])
             report_year, report_quarter = parse_report_name(report_name)
             if report_year is None or report_quarter is None:
-                raise DropItem("Reports that cannot be parsed: %s(%s) %s" % (item['stock_name'], item['stock_code'], item['report_name']))
+                raise DropItem("Reports that cannot be parsed: %s(%s) %s" % (
+                    item['stock_name'], item['stock_code'], item['report_name']))
 
             if item['is_single_quarter']:
                 self.reports_model = Report
@@ -115,8 +118,8 @@ class ReportPipeline(object):
                 self.report_items_model = XReportItem
 
             defer.ensureDeferred(self.download_report(item, report_year, report_quarter))
-
-        return item
+        else:
+            return item
 
     async def download_report(self, item, report_year, report_quarter):
         report_type = self.get_report_type(item['report_type'])

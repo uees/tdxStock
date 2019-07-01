@@ -4,14 +4,12 @@ from urllib.parse import urlencode
 
 import scrapy
 
-from basedata.models.category import Industry, IndustryStock
-from basedata.models.stock import Stock
-from fetchdata.items import StockItem
+from basedata.models.category import Industry
 from fetchdata.utils import get_params, string2dict
 
 
-class IndustrySpiderSpider(scrapy.Spider):
-    name = 'industry_spider'
+class ZJHIndustrySpider(scrapy.Spider):
+    name = 'industry_zjh'
     allowed_domains = ['163.com']
     start_urls = ['http://quotes.money.163.com/old/']
 

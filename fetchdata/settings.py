@@ -81,6 +81,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'fetchdata.pipelines.StockPipeline': 300,
+    'fetchdata.pipelines.IndustryPipeline': 300,
     'fetchdata.pipelines.ReportPipeline': 300,
 }
 
