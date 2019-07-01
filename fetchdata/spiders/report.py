@@ -3,7 +3,7 @@ import json
 from urllib.parse import urlencode
 
 import scrapy
-from django.db.models import Count, Q, Max
+from django.db.models import Max
 
 from basedata.models import Stock, Report, XReport
 from fetchdata import settings
@@ -44,15 +44,14 @@ class ReportSpider(scrapy.Spider):
 
     def closed(self, spider):
         # 关闭时更新最后报表日期
-        for stock in Stock.objects.all():
-            if self.is_single_quarter:
-                report = Report.objects.filter(stock_id=stock.id).aggregate(Max('report_date'))
-                stock.last_report_date = report['report_date__max']
-            else:
-                report = XReport.objects.filter(stock_id=stock.id).aggregate(Max('report_date'))
-                stock.last_all_report_date = report['report_date__max']
-
-            stock.save()
+        if self.is_single_quarter:
+            stocks = Report.objects.values('stock_id').annotate(last_date=Max('report_date'))
+            for stock in stocks:
+                Stock.objects.filter(pk=stock['stock_id']).update(last_report_date=stock['last_date'])
+        else:
+            stocks = XReport.objects.values('stock_id').annotate(last_date=Max('report_date'))
+            for stock in stocks:
+                Stock.objects.filter(pk=stock['stock_id']).update(last_all_report_date=stock['last_date'])
 
     def start_requests(self):
         # 获取报表数<=4的股票
