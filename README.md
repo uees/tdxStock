@@ -5,6 +5,7 @@
 #### 采集股票列表
 
 `scrapy crawl stock_list`
+
 `scrapy crawl stock_detail`
 
 #### 采集地域
@@ -18,6 +19,7 @@
 #### 采集行业
 
 `scrapy crawl industry_zjh`
+
 `scrapy crawl industry_sw`
 
 #### 采集财报数据
