@@ -1,13 +1,12 @@
-from urllib.parse import urlencode
+from django.db.models import Max
 
-import scrapy
+from basedata.models import Report, Stock, XReport
 
-from basedata.models import Stock
-
-from .report import ReportSpider
+from fetchdata.spiders.report import ReportSpider
 
 
 class StockReportSpider(ReportSpider):
+    """采用单个股票的报表，主要用于修复数据"""
     name = 'stock_report'
 
     def __init__(self, code, *args, **kwargs):
@@ -15,26 +14,15 @@ class StockReportSpider(ReportSpider):
 
         self.code = code
 
+    def closed(self, spider):
+        # 关闭时更新最后报表日期
+        if self.is_single_quarter:
+            report = Report.objects.filter(code=self.code).aggregate(Max('report_date'))
+            Stock.objects.filter(code=self.code).update(last_report_date=report['report_date__max'])
+        else:
+            report = XReport.objects.filter(code=self.code).aggregate(Max('report_date'))
+            Stock.objects.filter(code=self.code).update(last_all_report_date=report['report_date__max'])
+
     def start_requests(self):
         stock = Stock.objects.get(code=self.code)
-        params = {
-            "symbol": stock.code,
-            "type": self.type,
-            "is_detail": True,
-            "count": 5,
-            "timestamp": "",
-        }
-
-        headers = {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Referer': self.referer.format(code=stock.code),
-        }
-
-        url = "%s?%s" % (self.api, urlencode(params))
-        yield scrapy.Request(
-            url,
-            callback=self.parse,
-            cookies=self.cookies,
-            headers=headers,
-            meta={"stock": stock}
-        )
+        yield self.make_request(stock)

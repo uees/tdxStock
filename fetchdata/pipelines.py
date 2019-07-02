@@ -193,6 +193,33 @@ class ReportPipeline(object):
 
             report_item_model.objects.bulk_create(items_to_insert)
 
+        elif item['crawl_mode'] == 'all':
+            for slug, value in item['report_data'].items():
+                subject = await self.get_subject(report.report_type, slug)
+
+                if isinstance(value, list):
+                    value = value[0]
+
+                if isinstance(value, int) or isinstance(value, float):
+                    value_type = ReportItem.NUMBER_TYPE
+                else:
+                    value_type = ReportItem.STRING_TYPE
+
+                await self.update_or_create_item(
+                    report_item_model,
+                    report=report,
+                    subject=subject,
+                    defaults={
+                        "value_number": value if value_type == ReportItem.NUMBER_TYPE else None,
+                        "value": value if value_type != ReportItem.NUMBER_TYPE else None,
+                        "value_type": value_type,
+                    },
+                )
+
     async def get_or_create_report(self, report_model, *args, **kwargs):
         """检查是否已经下载, 去重"""
         return report_model.objects.get_or_create(*args, **kwargs)
+
+    async def update_or_create_item(self, item_model, *args, **kwargs):
+        """异步更新报表项"""
+        return item_model.objects.update_or_create(*args, **kwargs)

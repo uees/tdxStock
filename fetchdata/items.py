@@ -85,3 +85,4 @@ class ReportItem(scrapy.Item):
     report_year = scrapy.Field()
     report_quarter = scrapy.Field()
     is_single_quarter = scrapy.Field()
+    crawl_mode = scrapy.Field()

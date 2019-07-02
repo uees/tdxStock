@@ -5,11 +5,12 @@ from urllib.parse import urlencode
 import scrapy
 from django.db.models import Max
 
-from basedata.models import Stock, Report, XReport
+from basedata.models import Report, Stock, XReport
 from fetchdata import settings
 from fetchdata.items import ReportItem
 from fetchdata.utils import (fromtimestamp, get_quarter_date,
-                             parse_report_name, timestamp, trans_cookie, str_fix_null)
+                             parse_report_name, str_fix_null, timestamp,
+                             trans_cookie)
 
 
 class ReportSpider(scrapy.Spider):
@@ -19,28 +20,32 @@ class ReportSpider(scrapy.Spider):
     referer = "https://xueqiu.com/snowman/S/{code}/detail"
     cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, quarter, report, crawl_mode, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.quarter = quarter
+        self.report = report
+        self.crawl_mode = crawl_mode  # all or append, 全量或追加
 
         # 单季参数  S0 S1 S2 S3 S4
         # 报告期参数  all Q1 Q2 Q3 Q4
-        if getattr(self, 'quarter') == 'S0':
+        if self.quarter == 'S0':
             self.is_single_quarter = True
             self.type = 'S0'
         else:
             self.is_single_quarter = False
             self.type = 'all'
 
-        if getattr(self, 'report') == 'income':  # 利润表
+        if self.report == 'income':  # 利润表
             self.report_type = 'consolidated_income_sheet'
-        elif getattr(self, 'report') == 'indicator':  # 主要指标
+        elif self.report == 'indicator':  # 主要指标
             self.report_type = 'primary_indicator_sheet'
-        elif getattr(self, 'report') == 'balance':  # 资产负债表
+        elif self.report == 'balance':  # 资产负债表
             self.report_type = 'consolidated_balance_sheet'
-        elif getattr(self, 'report') == 'cash_flow':  # 现金流量表
+        elif self.report == 'cash_flow':  # 现金流量表
             self.report_type = 'cash_flow_sheet'
 
-        self.api = self.api.format(report=getattr(self, 'report'))
+        self.api = self.api.format(report=self.report)
 
     def closed(self, spider):
         # 关闭时更新最后报表日期
@@ -100,21 +105,11 @@ class ReportSpider(scrapy.Spider):
 
         last_report_name = data.get('last_report_name')  # 当前请求中的最后报告名
         if not last_report_name:
+            # 已经无报表了
             return
 
         stock = response.meta['stock']
-        # report_class = Report if self.is_single_quarter else XReport
-        # report = report_class.objects.filter(stock_id=stock.id).aggregate(Max('report_date'))
-        # first_report_date = report['report_date__max']
-        first_report_date = stock.last_report_date if self.is_single_quarter \
-            else stock.last_all_report_date
-
-        if not first_report_date:
-            # 上市日期
-            if stock.listing_date:
-                first_report_date = stock.listing_date - datetime.timedelta(days=365) * 2
-            else:
-                first_report_date = datetime.date(2008, 1, 1)
+        first_report_date = self.get_first_report_date(stock)
 
         last_report_year, last_report_quarter = parse_report_name(last_report_name)
         if last_report_year and last_report_quarter:
@@ -146,4 +141,20 @@ class ReportSpider(scrapy.Spider):
                         "report_year": report_year,
                         "report_quarter": report_quarter,
                         "is_single_quarter": self.is_single_quarter,
+                        "crawl_mode": self.crawl_mode,
                     })
+
+    def get_first_report_date(self, stock: Stock):
+        first_report_date = None
+        if self.crawl_mode == 'append':
+            first_report_date = stock.last_report_date if self.is_single_quarter \
+                else stock.last_all_report_date
+
+        if first_report_date is None:
+            # 上市日期
+            if stock.listing_date:
+                first_report_date = stock.listing_date - datetime.timedelta(days=365) * 2
+            else:
+                first_report_date = datetime.date(1997, 1, 1)
+
+        return first_report_date
