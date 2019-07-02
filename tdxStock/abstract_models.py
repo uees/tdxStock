@@ -29,7 +29,8 @@ class DynamicModel(object):
 
             # 不存在表则创建表
             cursor = connection.cursor()
-            if new_db_table not in connection.introspection.get_table_list(cursor):
+            tables = [tableinfo.name for tableinfo in connection.introspection.get_table_list(cursor)]
+            if new_db_table not in tables:
                 with connection.schema_editor() as schema_editor:
                     schema_editor.create_model(model_cls)
 
