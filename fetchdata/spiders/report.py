@@ -20,7 +20,7 @@ class ReportSpider(scrapy.Spider):
     referer = "https://xueqiu.com/snowman/S/{code}/detail"
     cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))
 
-    def __init__(self, quarter, report, crawl_mode, *args, **kwargs):
+    def __init__(self, quarter, report, crawl_mode="append", *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.quarter = quarter

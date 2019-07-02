@@ -3,9 +3,10 @@
 from scrapy.exceptions import DropItem
 from twisted.internet import defer, reactor
 
-from basedata.models import (AccountingSubject, Report, ReportItem, ReportType,
-                             Stock, XReport, XReportItem, Industry, IndustryStock,
-                             Concept, ConceptStock, Territory)
+from basedata.models import (AccountingSubject, Concept, ConceptStock,
+                             Industry, IndustryStock, Report, ReportItem,
+                             ReportType, Stock, Territory, XReport,
+                             XReportItem)
 from tdxStock.abstract_models import DynamicModel
 
 
@@ -191,7 +192,7 @@ class ReportPipeline(object):
                     value_type=value_type
                 ))
 
-            report_item_model.objects.bulk_create(items_to_insert)
+            await self.bulk_create_items(report_item_model, items_to_insert)
 
         elif item['crawl_mode'] == 'all':
             for slug, value in item['report_data'].items():
@@ -223,3 +224,7 @@ class ReportPipeline(object):
     async def update_or_create_item(self, item_model, *args, **kwargs):
         """异步更新报表项"""
         return item_model.objects.update_or_create(*args, **kwargs)
+
+    async def bulk_create_items(self, item_model, items_to_insert):
+        """批量插入"""
+        return item_model.objects.bulk_create(items_to_insert)
