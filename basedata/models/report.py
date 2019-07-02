@@ -112,6 +112,7 @@ class ReportItem(models.Model):
         return self.value, self.value_type
 
     class Meta:
+        abstract = True
         verbose_name = '单季度报表项目'
         verbose_name_plural = verbose_name
 
@@ -159,6 +160,7 @@ class XReportItem(models.Model):
         return self.value, self.value_type
 
     class Meta:
+        abstract = True
         verbose_name = '报告期报表项目'
         verbose_name_plural = verbose_name
 

@@ -112,18 +112,9 @@ class ReportPipeline(object):
     def __init__(self):
         self.report_types = {}
         self.subjects = {}
-        self.reports_model = None
-        self.report_items_model = None
 
     def process_item(self, item, spider):
         if spider.name == "report":
-            if item['is_single_quarter']:
-                self.reports_model = Report
-                self.report_items_model = DynamicModel(ReportItem, item['report_quarter'])
-            else:
-                self.reports_model = XReport
-                self.report_items_model = DynamicModel(XReportItem, item['report_quarter'])
-
             defer.ensureDeferred(self.download_report(item))
         else:
             return item
@@ -154,8 +145,10 @@ class ReportPipeline(object):
         return subject
 
     async def download_report(self, item):
+        report_model = Report if item['is_single_quarter'] else XReport
         report_type = await self.get_report_type(item['report_type'])
         report, created = await self.get_or_create_report(
+            report_model,
             stock_id=item['stock_id'],
             report_type=report_type,
             year=item['report_year'],
@@ -169,8 +162,13 @@ class ReportPipeline(object):
         await self.download_report_items(report, created, item)
 
     async def download_report_items(self, report, created, item):
+        if item['is_single_quarter']:
+            report_item_model = DynamicModel(ReportItem, item['report_year'])
+        else:
+            report_item_model = DynamicModel(XReportItem, item['report_year'])
+
         async def has_items():
-            return self.report_items_model.objects.filter(report=report).exists()
+            return report_item_model.objects.filter(report=report).exists()
 
         if created or not await has_items():
             items_to_insert = list()
@@ -185,7 +183,7 @@ class ReportPipeline(object):
                 else:
                     value_type = ReportItem.STRING_TYPE
 
-                items_to_insert.append(self.report_items_model(
+                items_to_insert.append(report_item_model(
                     report=report,
                     subject=subject,
                     value_number=value if value_type == ReportItem.NUMBER_TYPE else None,
@@ -193,8 +191,8 @@ class ReportPipeline(object):
                     value_type=value_type
                 ))
 
-            self.report_items_model.objects.bulk_create(items_to_insert)
+            report_item_model.objects.bulk_create(items_to_insert)
 
-    async def get_or_create_report(self, *args, **kwargs):
+    async def get_or_create_report(self, report_model, *args, **kwargs):
         """检查是否已经下载, 去重"""
-        return self.reports_model.objects.get_or_create(*args, **kwargs)
+        return report_model.objects.get_or_create(*args, **kwargs)

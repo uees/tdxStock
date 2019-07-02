@@ -15,29 +15,21 @@ class DynamicModel(object):
 
     def __new__(cls, base_cls, db_table_suffix):
         """
-        创建类根据表名
-        :param base_cls: 类名(这个类要models基类)
-        :param tb_name: 表名
-        :return: base_cls 类的实例
+        创建类
+        :param base_cls: 模型基类, 要在基类 Meta 中定义 abstract = True
+        :param db_table_suffix: 表后缀
+        :return new_model_cls: 类
         """
         new_cls_name = f"{base_cls.__name__}_{db_table_suffix}"
         if new_cls_name not in cls._instance:
-            new_meta_cls = base_cls._meta
-            new_meta_cls.db_table = "{}_{}".format(base_cls._meta.db_table, db_table_suffix)
-            model_cls = type(
-                new_cls_name,
-                (base_cls,),
-                {
-                    '__tablename__': new_meta_cls.db_table,
-                    '_meta': new_meta_cls,
-                    '__module__': base_cls.__module__
-                }
-            )
+            new_db_table = "{}_{}".format(base_cls._meta.db_table, db_table_suffix)
+            model_cls = type(new_cls_name, (base_cls,), {'__module__': base_cls.__module__})
+            model_cls._meta.db_table = new_db_table
             cls._instance[new_cls_name] = model_cls
 
             # 不存在表则创建表
             cursor = connection.cursor()
-            if new_meta_cls.db_table not in connection.introspection.get_table_list(cursor):
+            if new_db_table not in connection.introspection.get_table_list(cursor):
                 with connection.schema_editor() as schema_editor:
                     schema_editor.create_model(model_cls)
 
