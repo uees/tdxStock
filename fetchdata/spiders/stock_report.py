@@ -15,16 +15,6 @@ class StockReportSpider(ReportSpider):
         self.code = code
         self.crawl_mode = 'all'  # 强制全量采集
 
-    def closed(self, spider):
-        pass
-        # 关闭时更新最后报表日期
-        # if self.is_single_quarter:
-        #    report = Report.objects.filter(code=self.code).aggregate(Max('report_date'))
-        #    Stock.objects.filter(code=self.code).update(last_report_date=report['report_date__max'])
-        # else:
-        #    report = XReport.objects.filter(code=self.code).aggregate(Max('report_date'))
-        #    Stock.objects.filter(code=self.code).update(last_all_report_date=report['report_date__max'])
-
     def start_requests(self):
         stock = Stock.objects.get(code=self.code)
         yield self.make_request(stock)

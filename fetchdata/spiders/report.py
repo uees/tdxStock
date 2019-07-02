@@ -46,18 +46,6 @@ class ReportSpider(scrapy.Spider):
 
         self.api = self.api.format(report=self.report)
 
-    def closed(self, spider):
-        pass
-        # 关闭时更新最后报表日期
-        # if self.is_single_quarter:
-        #    stocks = Report.objects.values('stock_id').annotate(last_date=Max('report_date'))
-        #    for stock in stocks:
-        #        Stock.objects.filter(pk=stock['stock_id']).update(last_report_date=stock['last_date'])
-        # else:
-        #    stocks = XReport.objects.values('stock_id').annotate(last_date=Max('report_date'))
-        #    for stock in stocks:
-        #        Stock.objects.filter(pk=stock['stock_id']).update(last_all_report_date=stock['last_date'])
-
     def start_requests(self):
         # 获取报表数<=4的股票
         # if self.is_single_quarter:
