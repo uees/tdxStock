@@ -1,6 +1,6 @@
 from django.db import models
 
-from tdxStock.fields import UnsignedAutoField
+from tdxStock.fields import JSONField, UnsignedAutoField
 
 
 class Stock(models.Model):
@@ -38,8 +38,13 @@ class Stock(models.Model):
     registered_address = models.CharField('注册地址', max_length=250, null=True, blank=True)
     office_address = models.CharField('办公地址', max_length=250, null=True, blank=True)
     updated_at = models.DateTimeField('更新时间', auto_now=True, null=True, editable=False)
-    last_report_date = models.DateField('最后报告日期（单单季）', null=True, blank=True, editable=False)
-    last_all_report_date = models.DateField('最后报告日期（报告期）', null=True, blank=True, editable=False)
+
+    # metas 作用是缓存一些数据，便于采集
+    # primary_indicator_sheet: dict(last_report_date: str, last_all_report_date: str, quarter_list: [], all_list: [])
+    # consolidated_balance_sheet: dict(last_report_date: str, last_all_report_date: str, quarter_list: [], all_list: [])
+    # consolidated_income_sheet: dict(last_report_date: str, last_all_report_date: str, quarter_list: [], all_list: [])
+    # cash_flow_sheet: dict(last_report_date: str, last_all_report_date: str, quarter_list: [], all_list: [])
+    metas = JSONField('Metas', null=True, blank=True, editable=False)
 
     territory = models.ForeignKey('Territory', verbose_name='地域', null=True, blank=True,
                                   on_delete=models.SET_NULL)

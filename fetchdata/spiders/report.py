@@ -3,9 +3,8 @@ import json
 from urllib.parse import urlencode
 
 import scrapy
-from django.db.models import Max
 
-from basedata.models import Report, Stock, XReport
+from basedata.models import Stock
 from fetchdata import settings
 from fetchdata.items import ReportItem
 from fetchdata.utils import (fromtimestamp, get_quarter_date,
@@ -48,15 +47,16 @@ class ReportSpider(scrapy.Spider):
         self.api = self.api.format(report=self.report)
 
     def closed(self, spider):
+        pass
         # 关闭时更新最后报表日期
-        if self.is_single_quarter:
-            stocks = Report.objects.values('stock_id').annotate(last_date=Max('report_date'))
-            for stock in stocks:
-                Stock.objects.filter(pk=stock['stock_id']).update(last_report_date=stock['last_date'])
-        else:
-            stocks = XReport.objects.values('stock_id').annotate(last_date=Max('report_date'))
-            for stock in stocks:
-                Stock.objects.filter(pk=stock['stock_id']).update(last_all_report_date=stock['last_date'])
+        # if self.is_single_quarter:
+        #    stocks = Report.objects.values('stock_id').annotate(last_date=Max('report_date'))
+        #    for stock in stocks:
+        #        Stock.objects.filter(pk=stock['stock_id']).update(last_report_date=stock['last_date'])
+        # else:
+        #    stocks = XReport.objects.values('stock_id').annotate(last_date=Max('report_date'))
+        #    for stock in stocks:
+        #        Stock.objects.filter(pk=stock['stock_id']).update(last_all_report_date=stock['last_date'])
 
     def start_requests(self):
         # 获取报表数<=4的股票
@@ -145,10 +145,13 @@ class ReportSpider(scrapy.Spider):
                     })
 
     def get_first_report_date(self, stock: Stock):
+        metas = stock.metas if stock.metas else {}
         first_report_date = None
         if self.crawl_mode == 'append':
-            first_report_date = stock.last_report_date if self.is_single_quarter \
-                else stock.last_all_report_date
+            if self.is_single_quarter:
+                first_report_date = metas.get(self.report_type, {}).get('last_report_date')
+            else:
+                first_report_date = metas.get(self.report_type, {}).get('last_all_report_date')
 
         if first_report_date is None:
             # 上市日期
@@ -156,5 +159,8 @@ class ReportSpider(scrapy.Spider):
                 first_report_date = stock.listing_date - datetime.timedelta(days=365) * 2
             else:
                 first_report_date = datetime.date(1997, 1, 1)
+
+        if isinstance(first_report_date, str):
+            first_report_date = datetime.datetime.strptime(first_report_date, '%Y-%m-%d')
 
         return first_report_date
