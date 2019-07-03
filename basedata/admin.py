@@ -17,21 +17,22 @@ class SectionAdmin(admin.ModelAdmin):
 
 @admin.register(Industry)
 class IndustryAdmin(admin.ModelAdmin):
-    list_display = ('type', 'level', 'name', 'memo')
+    list_display = ('name', 'level', 'type', 'memo')
     list_select_related = ('parent', 'parent__parent')
+    list_display_links = ('name',)
 
-    def get_queryset(self, request):
-        """
-        Return a QuerySet of all model instances that can be edited by the
-        admin site. This is used by changelist_view.
-        """
-        qs = self.model._default_manager.get_queryset()
-        # 只显示3级分类
-        qs = qs.filter(parent__parent__isnull=False)
-        ordering = self.get_ordering(request)
-        if ordering:
-            qs = qs.order_by(*ordering)
-        return qs
+    # def get_queryset(self, request):
+    #    """
+    #    Return a QuerySet of all model instances that can be edited by the
+    #    admin site. This is used by changelist_view.
+    #    """
+    #    qs = self.model._default_manager.get_queryset()
+    #    # 只显示3级分类
+    #    qs = qs.filter(parent__parent__isnull=False)
+    #    ordering = self.get_ordering(request)
+    #    if ordering:
+    #        qs = qs.order_by(*ordering)
+    #    return qs
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "parent":
