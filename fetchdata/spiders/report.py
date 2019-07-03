@@ -25,6 +25,8 @@ class ReportSpider(scrapy.Spider):
         self.quarter = quarter
         self.report = report
         self.crawl_mode = crawl_mode  # all or append, 全量或追加
+        self.start_year = getattr(self, 'start_year')
+        self.end_year = getattr(self, 'end_year')
 
         # 单季参数  S0 S1 S2 S3 S4
         # 报告期参数  all Q1 Q2 Q3 Q4
@@ -59,10 +61,16 @@ class ReportSpider(scrapy.Spider):
 
         # stocks = qs.filter(reports_num__lte=4).all()
 
+        if self.end_year:
+            # 因为是按时间逆序排列，获取全年数据需要使用 quarter=4
+            unixtime = timestamp(get_quarter_date(year=int(self.end_year), quarter=4)) + 1
+        else:
+            unixtime = ''
+
         stocks = Stock.objects.all()
 
         for stock in stocks:
-            yield self.make_request(stock)
+            yield self.make_request(stock, unixtime)
 
     def make_request(self, stock, timestamp=''):
         params = {
@@ -133,6 +141,9 @@ class ReportSpider(scrapy.Spider):
                     })
 
     def get_first_report_date(self, stock: Stock):
+        if self.start_year:
+            return datetime.date(int(self.start_year), 1, 1)
+
         metas = stock.metas if stock.metas else {}
         first_report_date = None
         if self.crawl_mode == 'append':
