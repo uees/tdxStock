@@ -13,12 +13,12 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 import environ
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-# BASE_DIR = root()
-BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-
+root = environ.Path(__file__) - 2  # two folder back (/a/b/c/ - 2 = /a/)
 env = environ.Env(DEBUG=(bool, False), )
-env.read_env(os.path.join(BASE_DIR, '.env'))  # reading .env file
+env.read_env(root('.env'))  # reading .env file
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = root()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -31,10 +31,7 @@ DEBUG = env('DEBUG', cast=bool, default=True)
 
 SQL_DEBUG = DEBUG
 
-ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-]
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -96,20 +93,17 @@ WSGI_APPLICATION = 'tdxStock.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': env('MYSQL_HOST', default='127.0.0.1'),
-        'PORT': env('MYSQL_PORT', default='3306'),
-        'NAME': env('MYSQL_NAME', default='dbname'),
-        'USER': env('MYSQL_USER', default='user'),
-        'PASSWORD': env('MYSQL_PASSWORD', default='pass'),
-        'default-character-set': 'utf8',
-        'OPTIONS': {
-            'init_command': 'SET default_storage_engine=MyISAM',
-            'charset': 'utf8mb4'
-        },
+_default_db_conf = env.db()
+_default_db_conf.update({
+    # Tell Django to build the test database with the 'utf8mb4' character set
+    'TEST': {
+        'CHARSET': 'utf8mb4',
+        'COLLATION': 'utf8mb4_unicode_ci',
     }
+})
+
+DATABASES = {
+    'default': _default_db_conf,
 }
 
 # Password validation
@@ -145,16 +139,20 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
-PUBLIC_ROOT = os.path.join(BASE_DIR, 'public')
+public_root = root.path('public/')
 
+MEDIA_ROOT = public_root('media')
+MEDIA_URL = '/media/'
+
+STATIC_ROOT = public_root('static')
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    os.path.join(PUBLIC_ROOT, 'static'),
-]
-
-MEDIA_ROOT = os.path.join(PUBLIC_ROOT, 'media')
-MEDIA_URL = '/media/'
+# 配置静态文件搜索路径
+STATICFILES_DIRS = (
+    ('css', public_root('static/css')),
+    ('js', public_root('static/js')),
+    ('img', public_root('static/img')),
+)
 
 # 允许使用用户名或密码登录
 AUTHENTICATION_BACKENDS = ['account.user_login_backend.EmailOrUsernameModelBackend']
@@ -165,7 +163,8 @@ LOGIN_URL = '/account/login/'
 LOGIN_REDIRECT_URL = '/'
 
 TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
-DATE_TIME_FORMAT = '%Y-%m-%d'
+DATETIME_FORMAT = 'Y-m-d H:i:s'
+DATE_FORMAT = 'Y-m-d'
 
 # 分页
 PAGINATE_BY = 25
@@ -176,12 +175,12 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_USE_TLS = True
 EMAIL_USE_SSL = True
 
-EMAIL_HOST = env('MAIL_HOST')
-EMAIL_PORT = env('MAIL_PORT')
-EMAIL_HOST_USER = env('MAIL_USERNAME')
-EMAIL_HOST_PASSWORD = env('MAIL_PASSWORD')
-DEFAULT_FROM_EMAIL = env('MAIL_FROM')
-SERVER_EMAIL = env('MAIL_NAME')
+EMAIL_HOST = env('MAIL_HOST', default='localhost')
+EMAIL_PORT = env('MAIL_PORT', default=1025)
+EMAIL_HOST_USER = env('MAIL_USERNAME', default='')
+EMAIL_HOST_PASSWORD = env('MAIL_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = env('MAIL_FROM', default='webmaster@tdxstock.com')
+SERVER_EMAIL = env('MAIL_NAME', default='tdxStock')
 
 # 设置 debug=false 未处理异常邮件通知
 ADMINS = [('yang', 'wnh3yang@gmail.com')]
@@ -210,7 +209,7 @@ LOGGING = {
         'log_file': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'txdStock.log',
+            'filename': root('storage/logs/txdStock.log'),
             'maxBytes': 16 * 1024 * 1024,  # 16 MB
             'formatter': 'verbose'
         },
@@ -247,7 +246,6 @@ IDENTICON_FOREGROUND = ['#000000', '#0000CC', '#0099CC', '#33CC33', '#33FFFF', '
                         '#66FF00', '#CC33CC', '#FF0033', '#FF6666', '#FFFF66', '#99CC66']
 
 SITE_NAME = 'TdxStock'
-SITE_URL = 'http://localhost:8000'
 SITE_DESCRIPTION = '大巧无工,重剑无锋.'
 
 # bootstrap颜色样式
