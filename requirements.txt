@@ -2,6 +2,8 @@ Django==2.2.10
 django-debug-toolbar==2.0
 django-environ==0.4.5
 django-extensions==2.1.9
+django-filter==2.2.0
+djangorestframework==3.11.0
 mysqlclient==1.4.6
 Pillow==7.0.0
 redis==3.4.1
