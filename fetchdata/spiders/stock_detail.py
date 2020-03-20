@@ -4,16 +4,16 @@ from urllib.parse import urlencode
 import scrapy
 
 from basedata.models.stock import Stock
-from fetchdata import settings
 from fetchdata.items import StockItem
-from fetchdata.utils import fromtimestamp, trans_cookie
+from fetchdata.utils import fromtimestamp
+from tdxStock.helpers import read_cookie
 
 
 class StockDetailSpider(scrapy.Spider):
     name = 'stock_detail'
     allowed_domains = ['xueqiu.com']
 
-    cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))
+    cookies = read_cookie("xueqiu")
     api = "https://stock.xueqiu.com/v5/stock/f10/cn/company.json"
     referer = "https://xueqiu.com/snowman/S/{code}/detail"
 

@@ -41,23 +41,6 @@ def fromtimestamp(t):
     return datetime.fromtimestamp(t)
 
 
-def trans_cookie(cookie_str):
-    return string2dict(cookie_str)
-
-
-def string2dict(string, eq="=", split=";"):
-    result = {}
-    items = string.split(split)
-
-    for item in items:
-        eq_pos = item.find(eq)
-        key = item[:eq_pos].strip()
-        value = item[eq_pos + len(eq):]
-        result[key] = value
-
-    return result
-
-
 def get_params(response):
     params = {}
     url = response.request.url
@@ -105,27 +88,3 @@ def parse_report_name(report_name):
         return report_year, report_quarter
 
     return None, None
-
-
-def is_number(value):
-    try:
-        value + 1
-    except TypeError:
-        return False
-    else:
-        return True
-
-
-def is_number_like(value):
-    try:
-        int(value)
-    except ValueError:
-        return False
-    else:
-        return True
-
-
-def str_fix_null(value):
-    if value is None:
-        value = ''
-    return value

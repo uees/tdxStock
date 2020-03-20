@@ -5,11 +5,10 @@ from urllib.parse import urlencode
 import scrapy
 
 from basedata.models import Stock
-from fetchdata import settings
 from fetchdata.items import ReportItem
 from fetchdata.utils import (fromtimestamp, get_quarter_date,
-                             parse_report_name, str_fix_null, timestamp,
-                             trans_cookie)
+                             parse_report_name, timestamp)
+from tdxStock.helpers import read_cookie, str_fix_null
 
 
 class ReportSpider(scrapy.Spider):
@@ -17,7 +16,7 @@ class ReportSpider(scrapy.Spider):
     allowed_domains = ['xueqiu.com']
     api = "https://stock.xueqiu.com/v5/stock/finance/cn/{report}.json"
     referer = "https://xueqiu.com/snowman/S/{code}/detail"
-    cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))
+    cookies = read_cookie("xueqiu")
 
     def __init__(self, quarter, report, crawl_mode="append", *args, **kwargs):
         super().__init__(*args, **kwargs)

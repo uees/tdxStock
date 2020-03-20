@@ -4,9 +4,9 @@ from urllib.parse import urlencode
 
 import scrapy
 
-from fetchdata import settings
 from fetchdata.items import StockItem
-from fetchdata.utils import timestamp, trans_cookie, get_params
+from fetchdata.utils import timestamp, get_params
+from tdxStock.helpers import read_cookie
 
 
 class StockSpider(scrapy.Spider):
@@ -16,7 +16,7 @@ class StockSpider(scrapy.Spider):
 
     api = "https://xueqiu.com/service/v5/stock/screener/quote/list"
     per_page = 90
-    cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))
+    cookies = read_cookie("xueqiu")
     headers = {
         'X-Requested-With': 'XMLHttpRequest',
         'Referer': "https://xueqiu.com/hq",

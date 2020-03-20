@@ -4,7 +4,8 @@ from urllib.parse import urlencode
 import scrapy
 
 from basedata.models.category import Industry
-from fetchdata.utils import get_params, string2dict
+from fetchdata.utils import get_params
+from tdxStock.helpers import string2dict
 
 
 class ZJHIndustrySpider(scrapy.Spider):

@@ -1,5 +1,3 @@
-from django.db.models import Max
-
 from basedata.models import Report, Stock, XReport
 
 from fetchdata.spiders.report import ReportSpider

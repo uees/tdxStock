@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from scrapy.exceptions import DropItem
 from twisted.internet import defer, reactor
 

@@ -6,8 +6,8 @@ import scrapy
 from selenium import webdriver
 
 from basedata.models import Industry
-from fetchdata import settings
-from fetchdata.utils import get_params, timestamp, trans_cookie
+from fetchdata.utils import get_params, timestamp
+from tdxStock.helpers import read_cookie
 
 
 class SWIndustrySpider(scrapy.Spider):
@@ -20,7 +20,7 @@ class SWIndustrySpider(scrapy.Spider):
         'X-Requested-With': 'XMLHttpRequest',
         'Referer': "https://xueqiu.com/hq",
     }
-    cookies = trans_cookie(settings.env('XUEQIU_COOKIES'))
+    cookies = read_cookie("xueqiu")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
