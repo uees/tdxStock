@@ -20,6 +20,7 @@ from django.urls import path, include, re_path
 from django.views.generic.base import RedirectView
 from rest_framework import routers
 from account import api
+from basedata import views as basedata_views
 
 admin.AdminSite.site_title = settings.SITE_NAME
 admin.AdminSite.site_header = '%s 管理' % settings.SITE_NAME
@@ -27,6 +28,8 @@ admin.AdminSite.site_header = '%s 管理' % settings.SITE_NAME
 router = routers.DefaultRouter()
 router.register(r'account/users', api.UserViewSet)
 router.register(r'account/groups', api.GroupViewSet)
+router.register(r'basedata/stocks', basedata_views.StockViewSet)
+router.register(r'basedata/industries', basedata_views.IndustryViewSet)
 
 urlpatterns = [
     path('', RedirectView.as_view(url='/wiki/'), name='index'),
