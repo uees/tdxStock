@@ -25,10 +25,11 @@ class SWIndustrySpider(scrapy.Spider):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.browser = webdriver.Firefox()
+        # self.browser = webdriver.Firefox()
 
     def closed(self, spider):
-        self.browser.close()
+        # self.browser.close()
+        pass
 
     def stock_list_request(self, industry_id, params):
         url = "%s?%s" % (self.api, urlencode(params))
