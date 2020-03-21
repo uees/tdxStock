@@ -29,7 +29,6 @@ router = routers.DefaultRouter()
 router.register(r'account/users', api.UserViewSet)
 router.register(r'account/groups', api.GroupViewSet)
 router.register(r'basedata/stocks', basedata_views.StockViewSet)
-router.register(r'basedata/industries', basedata_views.IndustryViewSet)
 
 urlpatterns = [
     path('', RedirectView.as_view(url='/wiki/'), name='index'),
@@ -37,6 +36,7 @@ urlpatterns = [
     path('account/', include('account.urls')),
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/basedata/industries/', basedata_views.IndustryView.as_view())
 ]
 
 if settings.DEBUG:

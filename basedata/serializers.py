@@ -21,11 +21,12 @@ class TerritorySerializer(serializers.ModelSerializer):
 
 
 class IndustrySerializer(serializers.ModelSerializer):
-    stocks = StockListingField(many=True, read_only=True)
-    # children = serializers.SerializerMethodField('_get_children')
-    # def _get_children(self, obj):
-    #    serializer = IndustrySerializer(obj.industry_set, many=True)
-    #    return serializer.data
+    # stocks = StockListingField(many=True, read_only=True)
+    children = serializers.SerializerMethodField('_get_children')
+
+    def _get_children(self, obj):
+        serializer = IndustrySerializer(obj.industry_set, many=True)
+        return serializer.data
 
     class Meta:
         model = Industry
