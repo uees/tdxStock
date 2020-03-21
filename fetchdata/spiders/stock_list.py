@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 import scrapy
 
 from fetchdata.items import StockItem
-from fetchdata.utils import timestamp, get_params
+from fetchdata.utils import get_params, timestamp
 from tdxStock.helpers import read_cookie
 
 

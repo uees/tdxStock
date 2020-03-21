@@ -1,5 +1,4 @@
-from basedata.models import Report, Stock, XReport
-
+from basedata.models import Stock
 from fetchdata.spiders.report import ReportSpider
 
 

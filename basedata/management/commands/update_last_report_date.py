@@ -21,26 +21,21 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options['single']:
-            reports = Report.objects.values('stock_id', 'report_type_id').annotate(last_date=Max('report_date'))
-            for report in reports:
-                stock = Stock.objects.get(pk=report['stock_id'])
-                report_type = ReportType.objects.get(pk=report['report_type_id'])
-
-                metas = stock.metas if stock.metas else {}
-                dict_merge(metas, {report_type.slug: {"last_report_date": report['last_date']}})
-                stock.metas = metas
-
-                stock.save()
+            report_model = Report
+            key = "last_report_date"
         else:
-            reports = XReport.objects.values('stock_id', 'report_type_id').annotate(last_date=Max('report_date'))
-            for report in reports:
-                stock = Stock.objects.get(pk=report['stock_id'])
-                report_type = ReportType.objects.get(pk=report['report_type_id'])
+            report_model = XReport
+            key = "last_all_report_date"
 
-                metas = stock.metas if stock.metas else {}
-                dict_merge(metas, {report_type.slug: {"last_all_report_date": report['last_date']}})
-                stock.metas = metas
+        reports = report_model.objects.values('stock_id', 'report_type_id').annotate(last_date=Max('report_date'))
+        for report in reports:
+            stock = Stock.objects.get(pk=report['stock_id'])
+            report_type = ReportType.objects.get(pk=report['report_type_id'])
 
-                stock.save()
+            metas = stock.metas if stock.metas else {}
+            dict_merge(metas, {report_type.slug: {key: report['last_date']}})
+            stock.metas = metas
+
+            stock.save()
 
         self.stdout.write(self.style.SUCCESS('success!'))

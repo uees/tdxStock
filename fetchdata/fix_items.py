@@ -1,5 +1,5 @@
-from twisted.internet import defer
 from django.db.models import Q
+from twisted.internet import defer
 
 from basedata.models import ReportItem
 

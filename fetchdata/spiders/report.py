@@ -24,8 +24,8 @@ class ReportSpider(scrapy.Spider):
         self.quarter = quarter
         self.report = report
         self.crawl_mode = crawl_mode  # all or append, 全量或追加
-        self.start_year = getattr(self, 'start_year')
-        self.end_year = getattr(self, 'end_year')
+        self.start_year = getattr(self, 'start_year', None)
+        self.end_year = getattr(self, 'end_year', None)
 
         # 单季参数  S0 S1 S2 S3 S4
         # 报告期参数  all Q1 Q2 Q3 Q4
