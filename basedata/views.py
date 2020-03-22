@@ -3,8 +3,9 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from basedata.models import Industry, Stock
-from basedata.serializers import IndustrySerializer, StockSerializer
+from basedata.models import Industry, Stock, Concept, Territory, Section
+from basedata.serializers import IndustrySerializer, StockSerializer, ConceptSerializer, TerritorySerializer, \
+    SectionSerializer
 
 
 class StockViewSet(viewsets.ReadOnlyModelViewSet):
@@ -17,15 +18,26 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
 class IndustryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Industry.objects.get_queryset()
     serializer_class = IndustrySerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
+    filter_fields = ('type',)
+    pagination_class = None
 
 
-class IndustryView(APIView):
-    def get(self, request: Request, format=None):
-        type = request.query_params.get('type', '证监会分类')
-        industries = Industry.objects.prefetch_related('industry_set')\
-            .filter(type=type).filter(parent__isnull=True).all()
+class ConceptViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Concept.objects.get_queryset()
+    serializer_class = ConceptSerializer
+    pagination_class = None
 
-        serializer = IndustrySerializer(industries, many=True)
-        return Response(serializer.data)
+
+class TerritoryViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Territory.objects.get_queryset()
+    serializer_class = TerritorySerializer
+    pagination_class = None
+
+
+class SectionViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Section.objects.get_queryset()
+    serializer_class = SectionSerializer
+    pagination_class = None
+
+
+# todo report views

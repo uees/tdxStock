@@ -1,27 +1,27 @@
 from abc import ABC
 
+from drf_dynamic_fields import DynamicFieldsMixin
 from rest_framework import serializers
 
 from tdxStock.abstract_models import DynamicModel
 
 from .models.report import AccountingSubject, Report, ReportType, XReport
 from .models.stock import Stock
-from .models.category import Concept, Territory, Industry
+from .models.category import Concept, Territory, Industry, Section
 
 
 class StockListingField(serializers.RelatedField, ABC):
     def to_representation(self, value):
-        return {'name': value.name, 'code': value.code}
+        return {'name': value.name, 'code': value.code, 'id': value.id}
 
 
-class TerritorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Territory
-        fields = '__all__'
+# DynamicFieldsMixin 要在 ModelSerializer 前面
+# ?omit=stocks,fields=name,id
+class IndustrySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    """行业 Serializer"""
 
-
-class IndustrySerializer(serializers.ModelSerializer):
     # stocks = StockListingField(many=True, read_only=True)
+
     # children = serializers.SerializerMethodField('_get_children')
     # def _get_children(self, obj):
     #     serializer = IndustrySerializer(obj.industry_set, many=True)
@@ -29,12 +29,36 @@ class IndustrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Industry
+        fields = "__all__"
+
+
+class ConceptSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    """概念 Serializer"""
+
+    # stocks = StockListingField(many=True, read_only=True)
+
+    class Meta:
+        model = Concept
         fields = '__all__'
 
 
-class ConceptSerializer(serializers.ModelSerializer):
+class TerritorySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    """地域 Serializer"""
+
+    # stocks = StockListingField(many=True, read_only=True, source='stock_set')
+
     class Meta:
-        model = Concept
+        model = Territory
+        fields = '__all__'
+
+
+class SectionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    """版块 Serializer"""
+
+    # stocks = StockListingField(many=True, read_only=True)
+
+    class Meta:
+        model = Section
         fields = '__all__'
 
 

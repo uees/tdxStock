@@ -28,7 +28,11 @@ admin.AdminSite.site_header = '%s 管理' % settings.SITE_NAME
 router = routers.DefaultRouter()
 router.register(r'account/users', api.UserViewSet)
 router.register(r'account/groups', api.GroupViewSet)
-router.register(r'basedata/stocks', basedata_views.StockViewSet)
+router.register(r'stocks', basedata_views.StockViewSet)
+router.register(r'industries', basedata_views.IndustryViewSet)
+router.register(r'concepts', basedata_views.ConceptViewSet)
+router.register(r'territories', basedata_views.TerritoryViewSet)
+router.register(r'sections', basedata_views.SectionViewSet)
 
 urlpatterns = [
     path('', RedirectView.as_view(url='/wiki/'), name='index'),
@@ -36,7 +40,6 @@ urlpatterns = [
     path('account/', include('account.urls')),
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('api/basedata/industries/', basedata_views.IndustryView.as_view())
 ]
 
 if settings.DEBUG:
