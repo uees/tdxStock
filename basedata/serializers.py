@@ -5,9 +5,10 @@ from rest_framework import serializers
 
 from tdxStock.abstract_models import DynamicModel
 
-from .models.report import AccountingSubject, Report, ReportType, XReport
+from .models.category import Concept, Industry, Section, Territory
+from .models.report import (AccountingSubject, Report, ReportItem, ReportType,
+                            XReport, XReportItem)
 from .models.stock import Stock
-from .models.category import Concept, Territory, Industry, Section
 
 
 class StockListingField(serializers.RelatedField, ABC):
@@ -20,7 +21,7 @@ class StockListingField(serializers.RelatedField, ABC):
 class IndustrySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """行业 Serializer"""
 
-    # stocks = StockListingField(many=True, read_only=True)
+    stocks = StockListingField(many=True, read_only=True)
 
     # children = serializers.SerializerMethodField('_get_children')
     # def _get_children(self, obj):
@@ -35,7 +36,7 @@ class IndustrySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 class ConceptSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """概念 Serializer"""
 
-    # stocks = StockListingField(many=True, read_only=True)
+    stocks = StockListingField(many=True, read_only=True)
 
     class Meta:
         model = Concept
@@ -45,7 +46,7 @@ class ConceptSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 class TerritorySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """地域 Serializer"""
 
-    # stocks = StockListingField(many=True, read_only=True, source='stock_set')
+    stocks = StockListingField(many=True, read_only=True, source='stock_set')
 
     class Meta:
         model = Territory
@@ -55,7 +56,7 @@ class TerritorySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 class SectionSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """版块 Serializer"""
 
-    # stocks = StockListingField(many=True, read_only=True)
+    stocks = StockListingField(many=True, read_only=True)
 
     class Meta:
         model = Section
@@ -84,17 +85,37 @@ class StockSerializer(serializers.ModelSerializer):
 
 
 class ReportSerializer(serializers.ModelSerializer):
-    stock = StockSerializer(read_only=True)
-    report_type = ReportTypeSerializer(read_only=True)
+    items = serializers.SerializerMethodField()  # 没指定 method_name, 则默认为 get_<field_name> 既 get_items
+    stock = serializers.SerializerMethodField()
+    report_type = ReportTypeSerializer()
+
+    def get_items(self, report: Report):
+        item_model = DynamicModel(ReportItem, report.year)
+        item_serializer = DynamicReportItemSerializer(ReportItem, report.year)
+        items = item_model.objects.select_related('subject').filter(report=report).all()
+        serializer = item_serializer(items, many=True)
+        return serializer.data
+
+    def get_stock(self, report: Report):
+        return {
+            "id": report.stock.id,
+            "name": report.stock.name,
+            "code": report.stock.code,
+        }
 
     class Meta:
         model = Report
         fields = '__all__'
 
 
-class XReportSerializer(serializers.ModelSerializer):
-    stock = StockSerializer(read_only=True)
-    report_type = ReportTypeSerializer(read_only=True)
+class XReportSerializer(ReportSerializer):
+
+    def get_items(self, report: XReport):
+        item_model = DynamicModel(XReportItem, report.year)
+        item_serializer = DynamicReportItemSerializer(XReportItem, report.year)
+        items = item_model.objects.select_related('subject').filter(report=report).all()
+        serializer = item_serializer(items, many=True)
+        return serializer.data
 
     class Meta:
         model = XReport
@@ -104,13 +125,13 @@ class XReportSerializer(serializers.ModelSerializer):
 class DynamicReportItemSerializer(object):
     def __new__(cls, base_cls, year):
         new_cls_name = f"{base_cls.__name__}_{year}Serializer"
-        model_cls = type(new_cls_name, (serializers.ModelSerializer,),
-                         {'__module__': serializers.ModelSerializer.__module__})
-        model_cls.subject = AccountingSubjectSerializer()
-
-        model_cls.Meta = type("Meta", (object,), {
-            "model": DynamicModel(base_cls, year),
-            "fields": '__all__'
-        })
+        model_cls = type(new_cls_name, (serializers.ModelSerializer,), {
+                             '__module__': serializers.ModelSerializer.__module__,
+                             'subject': AccountingSubjectSerializer(),
+                             'Meta': type("Meta", (object,), {
+                                 "model": DynamicModel(base_cls, year),
+                                 "fields": '__all__'
+                                 })
+                          })
 
         return model_cls
