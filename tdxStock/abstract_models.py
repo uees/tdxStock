@@ -12,6 +12,7 @@ class Timestamp(models.Model):
 
 class DynamicModel(object):
     _instance = dict()
+    _tables = [tableinfo.name for tableinfo in connection.introspection.get_table_list(connection.cursor())]
 
     def __new__(cls, base_cls, db_table_suffix):
         """
@@ -28,10 +29,9 @@ class DynamicModel(object):
             cls._instance[new_cls_name] = model_cls
 
             # 不存在表则创建表
-            cursor = connection.cursor()
-            tables = [tableinfo.name for tableinfo in connection.introspection.get_table_list(cursor)]
-            if new_db_table not in tables:
+            if new_db_table not in cls._tables:
                 with connection.schema_editor() as schema_editor:
                     schema_editor.create_model(model_cls)
+                    cls._tables.append(new_db_table)
 
         return cls._instance[new_cls_name]

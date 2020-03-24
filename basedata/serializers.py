@@ -16,6 +16,11 @@ class StockListingField(serializers.RelatedField, ABC):
         return {'name': value.name, 'code': value.code, 'id': value.id}
 
 
+class ReportField(serializers.RelatedField, ABC):
+    def to_representation(self, value):
+        return f"{value.year}-{value.quarter}"
+
+
 # DynamicFieldsMixin 要在 ModelSerializer 前面
 # ?omit=stocks,fields=name,id
 class IndustrySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
@@ -70,6 +75,8 @@ class ReportTypeSerializer(serializers.ModelSerializer):
 
 
 class AccountingSubjectSerializer(serializers.ModelSerializer):
+    report_type = ReportTypeSerializer()
+
     class Meta:
         model = AccountingSubject
         fields = '__all__'
@@ -77,7 +84,13 @@ class AccountingSubjectSerializer(serializers.ModelSerializer):
 
 class StockSerializer(serializers.ModelSerializer):
     metas = serializers.JSONField()
-    territory = TerritorySerializer()
+    territory = serializers.SerializerMethodField()
+
+    def get_territory(self, stock: Stock):
+        return {
+            'id': stock.territory.id,
+            'name': stock.territory.name
+        }
 
     class Meta:
         model = Stock
@@ -126,12 +139,16 @@ class DynamicReportItemSerializer(object):
     def __new__(cls, base_cls, year):
         new_cls_name = f"{base_cls.__name__}_{year}Serializer"
         model_cls = type(new_cls_name, (serializers.ModelSerializer,), {
-                             '__module__': serializers.ModelSerializer.__module__,
-                             'subject': AccountingSubjectSerializer(),
-                             'Meta': type("Meta", (object,), {
-                                 "model": DynamicModel(base_cls, year),
-                                 "fields": '__all__'
-                                 })
-                          })
+            '__module__': serializers.ModelSerializer.__module__,
+            'subject': serializers.SlugRelatedField(
+                read_only=True,
+                slug_field='name'
+            ),
+            'report': ReportField(read_only=True),  # serializers.StringRelatedField(),
+            'Meta': type("Meta", (object,), {
+                "model": DynamicModel(base_cls, year),
+                "fields": '__all__'
+            })
+        })
 
         return model_cls
