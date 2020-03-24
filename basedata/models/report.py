@@ -114,6 +114,7 @@ class ReportItem(models.Model):
         abstract = True
         verbose_name = '单季度报表项目'
         verbose_name_plural = verbose_name
+        index_together = ["report", "subject"]
 
 
 class XReport(models.Model):
@@ -162,3 +163,4 @@ class XReportItem(models.Model):
         abstract = True
         verbose_name = '报告期报表项目'
         verbose_name_plural = verbose_name
+        index_together = ["report", "subject"]

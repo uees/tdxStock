@@ -65,3 +65,71 @@ clean_migrations
 seed_options
 seed_report_types
 ```
+
+### API
+
+#### `/api/stocks/` 获取股票列表和查看单个股票
+
+params:
+
+    + `name`
+    + `code`
+
+#### `/api/industries/` 行业信息接口
+
+params:
+
+    + `omit`: 排除的字段， 例如 omit=stocks,id
+    + `fileds`: 指定字段
+    + `type`: value is `证监会分类` or `申万行业分类`
+
+
+#### `/api/concepts/` 概念接口
+
+params:
+
+    + `omit`: 排除的字段， 例如 omit=stocks,id
+    + `fileds`: 指定字段
+
+#### `/api/sections/` 板块接口
+
+params:
+
+    + `omit`: 排除的字段， 例如 omit=stocks,id
+    + `fileds`: 指定字段
+
+#### `/api/territories/` 地域接口
+
+params:
+
+    + `omit`: 排除的字段， 例如 omit=stocks,id
+    + `fileds`: 指定字段
+
+#### `/api/report-types/` 报告类型接口
+
+#### `/api/subjects/` 会计科目接口
+
+#### `/api/reports/` 单季报接口
+
+params:
+
+    + `stock`: 股票ID
+    + `report_type`: report_type ID
+    + `quarter_str`: 季度，例如：2018-2
+
+#### `/api/xreports/` 报告期季报接口
+
+params:
+
+    + `stock`: 股票ID
+    + `report_type`: report_type ID
+    + `quarter_str`: 季度，例如：2018-2
+
+#### `/api/compare/` 比较信息接口
+
+params:
+
+    + `stocks`: 股票列表 ID 字符串， 逗号 `,` 号分隔，例如 stocks=25,36,456
+    + `subject`: subject ID
+    + `is_single`: 是否单季度报
+    + `quarter`: 季度， such as 2018-2
