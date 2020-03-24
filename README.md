@@ -60,10 +60,10 @@ scrapy crawl stock_report -a quarter=S0 -a report=income
 ### 一些命令
 
 ```
-update_last_report_date --singe  // 更新最后报表日期
-clean_migrations
-seed_options
-seed_report_types
+python manage.py update_last_report_date [--single]  // 更新最后报表日期
+python manage.py clean_migrations
+python manage.py seed_options
+python manage.py seed_report_types
 ```
 
 ### API
