@@ -141,14 +141,15 @@ class ReportItemSerializer(serializers.Serializer):
     value = serializers.CharField(read_only=True, max_length=64, allow_blank=True)
     value_type = serializers.IntegerField(read_only=True)
     value_unit = serializers.IntegerField(read_only=True)
-    # subject = serializers.SerializerMethodField()
+    subject_id = serializers.IntegerField(read_only=True)
+    stock = serializers.SerializerMethodField()
     quarter = serializers.SerializerMethodField()
 
     def get_quarter(self, item):
         return f"{item.report.year}-{item.report.quarter}"
 
-    def get_subject(self, item):
-        return item.subject.name
+    def get_stock(self, item):
+        return item.report.stock.name
 
 
 class DynamicReportItemSerializer(object):

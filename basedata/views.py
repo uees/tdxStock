@@ -1,5 +1,4 @@
-from django.db.models import CharField, ExpressionWrapper, F, Q, Value
-from django.db.models.functions import Concat
+from django.db.models import Q
 from rest_framework import filters, status, viewsets
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -10,7 +9,6 @@ from basedata.models import (
     Section, Stock, Territory, XReport, XReportItem)
 from basedata.serializers import (AccountingSubjectSerializer,
                                   ConceptSerializer,
-                                  DynamicReportItemSerializer,
                                   IndustrySerializer, ReportItemSerializer,
                                   ReportSerializer, ReportTypeSerializer,
                                   SectionSerializer, StockSerializer,
@@ -126,36 +124,8 @@ class CompareView(APIView):
         # 1. get all reports
         reports = report_class.objects.filter(stock__in=stock_ids).filter(report_type=subject.report_type).all()
 
-        '''
         # 2. use reports and subject to select report_items
-        # todo 这里很低效, 需要改进
-        report_items = []
-        for report in reports:
-            item_model = DynamicModel(report_item_class, report.year)
-            qs = item_model.objects.select_related('report', 'subject') \
-                .filter(subject_id=subject.id) \
-                .filter(report_id=report.id)
-
-            if quarter:
-                qs = qs.filter(report__quarter=quarter)
-
-            item = qs.first()
-
-            serializer_class = DynamicReportItemSerializer(report_item_class, report.year)
-
-            if item:
-                report_items.append(serializer_class(item).data)
-
-        return Response(report_items)
-        '''
-
-        # 2. use reports and subject to select report_items
-        items_queryset = self.get_items_queryset(reports, report_item_class)
-
-        items_queryset = items_queryset.filter(subject_id=subject.id)
-
-        if quarter:
-            items_queryset = items_queryset.filter(report__quarter=quarter)
+        items_queryset = self.get_items_queryset(reports, subject, quarter, report_item_class)
 
         report_items = items_queryset.all()
 
@@ -163,12 +133,18 @@ class CompareView(APIView):
 
         return Response(serializer.data)
 
-    def get_items_queryset(self, reports, report_item_class):
+    def get_items_queryset(self, reports, subject, quarter, report_item_class):
         queryset = DynamicModel(report_item_class, reports[0].year).objects.none()
         querysets = []
         for report in reports:
             item_model = DynamicModel(report_item_class, report.year)
-            qs = item_model.objects.select_related('report', 'report__stock').filter(report_id=report.id)
+            qs = item_model.objects.select_related('report', 'report__stock')\
+                .filter(report=report)\
+                .filter(subject=subject)
+
+            if quarter:
+                qs = qs.filter(report__quarter=quarter)
+
             querysets.append(qs)
 
         return queryset.union(*querysets)
