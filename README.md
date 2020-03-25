@@ -33,7 +33,7 @@ scrapy crawl industry_sw
 #### 采集财报数据
 
 ```
-scrapy crawl report -a quarter=S0 -a crawl_mode=append -a report=income
+scrapy crawl report -a quarter=S0 -a crawl_mode=append -a report=balance
 ```
 
 + quarter:
@@ -53,7 +53,7 @@ scrapy crawl report -a quarter=S0 -a crawl_mode=append -a report=income
 如果发现有数据丢失，可以修复数据：
 
 ```
-scrapy crawl stock_report -a quarter=S0 -a report=income
+scrapy crawl stock_report -a quarter=S0 -a report=balance
 ```
 
 
@@ -70,40 +70,40 @@ python manage.py seed_report_types
 
 #### `/api/stocks/` 获取股票列表和查看单个股票
 
-params:
+**params**:
 
-    + `name`
-    + `code`
++ `name`
++ `code`
 
 #### `/api/industries/` 行业信息接口
 
-params:
+**params**:
 
-    + `omit`: 排除的字段， 例如 omit=stocks,id
-    + `fileds`: 指定字段
-    + `type`: value is `证监会分类` or `申万行业分类`
++ `omit`: 排除的字段， 例如 omit=stocks,id
++ `fileds`: 指定字段
++ `type`: value is `证监会分类` or `申万行业分类`
 
 
 #### `/api/concepts/` 概念接口
 
-params:
+**params**:
 
-    + `omit`: 排除的字段， 例如 omit=stocks,id
-    + `fileds`: 指定字段
++ `omit`: 排除的字段， 例如 omit=stocks,id
++ `fileds`: 指定字段
 
 #### `/api/sections/` 板块接口
 
-params:
+**params**:
 
-    + `omit`: 排除的字段， 例如 omit=stocks,id
-    + `fileds`: 指定字段
++ `omit`: 排除的字段， 例如 omit=stocks,id
++ `fileds`: 指定字段
 
 #### `/api/territories/` 地域接口
 
-params:
+**params**:
 
-    + `omit`: 排除的字段， 例如 omit=stocks,id
-    + `fileds`: 指定字段
++ `omit`: 排除的字段， 例如 omit=stocks,id
++ `fileds`: 指定字段
 
 #### `/api/report-types/` 报告类型接口
 
@@ -111,25 +111,25 @@ params:
 
 #### `/api/reports/` 单季报接口
 
-params:
+**params**:
 
-    + `stock`: 股票ID
-    + `report_type`: report_type ID
-    + `quarter_str`: 季度，例如：2018-2
++ `stock`: 股票ID
++ `report_type`: report_type ID
++ `quarter_str`: 季度，例如：2018-2
 
 #### `/api/xreports/` 报告期季报接口
 
-params:
+**params**:
 
-    + `stock`: 股票ID
-    + `report_type`: report_type ID
-    + `quarter_str`: 季度，例如：2018-2
++ `stock`: 股票ID
++ `report_type`: report_type ID
++ `quarter_str`: 季度，例如：2018-2
 
 #### `/api/compare/` 比较信息接口
 
-params:
+**params**:
 
-    + `stocks`: 股票列表 ID 字符串， 逗号 `,` 号分隔，例如 stocks=25,36,456
-    + `subject`: subject ID
-    + `is_single`: 是否单季度报
-    + `quarter`: 季度， such as 2018-2
++ `stocks`: 股票列表 ID 字符串， 逗号 `,` 号分隔，例如 stocks=25,36,456
++ `subject`: subject ID
++ `is_single`: 是否单季度报
++ `quarter`: 季度， such as 2018-2
