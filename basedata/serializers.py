@@ -104,9 +104,10 @@ class ReportSerializer(serializers.ModelSerializer):
 
     def get_items(self, report: Report):
         item_model = DynamicModel(ReportItem, report.year)
-        item_serializer = DynamicReportItemSerializer(ReportItem, report.year)
-        items = item_model.objects.select_related('subject').filter(report=report).all()
-        serializer = item_serializer(items, many=True)
+        items = item_model.objects.select_related('report', 'report__stock').filter(report=report).all()
+
+        # item_serializer = DynamicReportItemSerializer(ReportItem, report.year)
+        serializer = ReportItemSerializer(items, many=True)
         return serializer.data
 
     def get_stock(self, report: Report):
@@ -125,9 +126,10 @@ class XReportSerializer(ReportSerializer):
 
     def get_items(self, report: XReport):
         item_model = DynamicModel(XReportItem, report.year)
-        item_serializer = DynamicReportItemSerializer(XReportItem, report.year)
-        items = item_model.objects.select_related('subject').filter(report=report).all()
-        serializer = item_serializer(items, many=True)
+        items = item_model.objects.select_related('report', 'report__stock').filter(report=report).all()
+
+        # item_serializer = DynamicReportItemSerializer(XReportItem, report.year)
+        serializer = ReportItemSerializer(items, many=True)
         return serializer.data
 
     class Meta:
