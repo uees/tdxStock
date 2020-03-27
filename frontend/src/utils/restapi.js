@@ -10,7 +10,10 @@ export default class RestApi {
     this.config = Object.assign({}, options, config)
     this.url = this.config.url
     if (this.config.subPath) {
-      this.url = `${this.url}/${this.config.subPath}`
+      if (!this.url.endsWith('/')) {
+        this.url = `${this.url}/`
+      }
+      this.url = `${this.url}${this.config.subPath}`
     }
     this.methods = this.config.methods
     this.applyApi()
@@ -31,19 +34,28 @@ export default class RestApi {
 
     if (this.methods.includes('update')) {
       this.update = (id, obj, config) => {
-        return request.patch(`${this.url}/${id}`, obj, config)
+        if (!this.url.endsWith('/')) {
+          this.url = `${this.url}/`
+        }
+        return request.patch(`${this.url}${id}`, obj, config)
       }
     }
 
     if (this.methods.includes('destroy')) {
       this.destroy = (id, config) => {
-        return request.delete(`${this.url}/${id}`, config)
+        if (!this.url.endsWith('/')) {
+          this.url = `${this.url}/`
+        }
+        return request.delete(`${this.url}${id}`, config)
       }
     }
 
     if (this.methods.includes('show')) {
       this.show = (id, config) => {
-        return request.get(`${this.url}/${id}`, config)
+        if (!this.url.endsWith('/')) {
+          this.url = `${this.url}/`
+        }
+        return request.get(`${this.url}${id}`, config)
       }
     }
   }

@@ -91,31 +91,31 @@ const actions = {
   },
   async loadIndustries({ state }, params) {
     state.industries.loading = true
-    const { results } = await industriesApi.list({ params })
-    state.industries.data = results
+    const industries = await industriesApi.list({ params })
+    state.industries.data = industries
     state.industries.loading = false
-    return results
+    return industries
   },
   async loadConcepts({ state }, params) {
     state.concepts.loading = true
-    const { results } = await conceptsApi.list({ params })
-    state.concepts.data = results
+    const concepts = await conceptsApi.list({ params })
+    state.concepts.data = concepts
     state.concepts.loading = false
-    return results
+    return concepts
   },
   async loadSections({ state }, params) {
     state.sections.loading = true
-    const { results } = await sectionsApi.list({ params })
-    state.sections.data = results
+    const sections = await sectionsApi.list({ params })
+    state.sections.data = sections
     state.sections.loading = false
-    return results
+    return sections
   },
   async loadTerritories({ state }, params) {
     state.territories.loading = true
-    const { results } = await territoriesApi.list({ params })
-    state.territories.data = results
+    const territories = await territoriesApi.list({ params })
+    state.territories.data = territories
     state.territories.loading = false
-    return results
+    return territories
   },
   async loadReportTypes({ state }, params) {
     state.reportTypes.loading = true

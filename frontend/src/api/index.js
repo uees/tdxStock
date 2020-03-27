@@ -5,7 +5,7 @@ import request from '../utils/request'
  * 获取股票列表和查看单个股票
  */
 export const stocksApi = new RestApi({
-  url: '/stocks',
+  url: '/stocks/',
   methods: ['list', 'show']
 })
 
@@ -13,7 +13,7 @@ export const stocksApi = new RestApi({
  * 行业信息接口
  */
 export const industriesApi = new RestApi({
-  url: '/industries',
+  url: '/industries/',
   methods: ['list', 'show']
 })
 
@@ -21,7 +21,7 @@ export const industriesApi = new RestApi({
  * 概念接口
  */
 export const conceptsApi = new RestApi({
-  url: '/concepts',
+  url: '/concepts/',
   methods: ['list', 'show']
 })
 
@@ -29,7 +29,7 @@ export const conceptsApi = new RestApi({
  * 板块接口
  */
 export const sectionsApi = new RestApi({
-  url: '/sections',
+  url: '/sections/',
   methods: ['list', 'show']
 })
 
@@ -37,7 +37,7 @@ export const sectionsApi = new RestApi({
  * 地域接口
  */
 export const territoriesApi = new RestApi({
-  url: '/territories',
+  url: '/territories/',
   methods: ['list', 'show']
 })
 
@@ -45,7 +45,7 @@ export const territoriesApi = new RestApi({
  * 报告类型接口
  */
 export const reportTypesApi = new RestApi({
-  url: 'report-types',
+  url: '/report-types/',
   methods: ['list', 'show']
 })
 
@@ -53,7 +53,7 @@ export const reportTypesApi = new RestApi({
  * 会计科目接口
  */
 export const subjectsApi = new RestApi({
-  url: 'subjects',
+  url: '/subjects/',
   methods: ['list', 'show']
 })
 
@@ -62,7 +62,7 @@ export const subjectsApi = new RestApi({
  * @param {object} params
  */
 export function get_report(params) {
-  return request.get('/reports', { params })
+  return request.get('/reports/', { params })
 }
 
 /**
@@ -70,7 +70,7 @@ export function get_report(params) {
  * @param {object} params
  */
 export function get_xreport(params) {
-  return request.get('/xreports', { params })
+  return request.get('/xreports/', { params })
 }
 
 /**
@@ -78,5 +78,5 @@ export function get_xreport(params) {
  * @param {object} params
  */
 export function compare_stock(params) {
-  return request.get('/compare', { params })
+  return request.get('/compare/', { params })
 }
