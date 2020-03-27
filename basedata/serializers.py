@@ -21,23 +21,30 @@ class ReportField(serializers.RelatedField, ABC):
         return f"{value.year}-{value.quarter}"
 
 
-# DynamicFieldsMixin 要在 ModelSerializer 前面
-# ?omit=stocks,fields=name,id
-class IndustrySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+class ListIndustrySerializer(serializers.ModelSerializer):
+    children = serializers.SerializerMethodField()
+
+    def get_children(self, industry):
+        serializer = ListIndustrySerializer(industry.children, many=True)
+        return serializer.data
+
+    class Meta:
+        model = Industry
+        exclude = ("stocks", )
+
+
+class IndustrySerializer(ListIndustrySerializer):
     """行业 Serializer"""
 
     stocks = StockListingField(many=True, read_only=True)
 
-    # children = serializers.SerializerMethodField('_get_children')
-    # def _get_children(self, obj):
-    #     serializer = IndustrySerializer(obj.industry_set, many=True)
-    #     return serializer.data
-
     class Meta:
         model = Industry
-        fields = "__all__"
+        fields = ("id", "parent", "name", "level", "type", "memo", "stocks")
 
 
+# DynamicFieldsMixin 要在 ModelSerializer 前面
+# ?omit=stocks,fields=name,id
 class ConceptSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """概念 Serializer"""
 
@@ -75,7 +82,11 @@ class ReportTypeSerializer(serializers.ModelSerializer):
 
 
 class AccountingSubjectSerializer(serializers.ModelSerializer):
-    report_type = ReportTypeSerializer()
+    children = serializers.SerializerMethodField()
+
+    def get_children(self, subject):
+        serializer = AccountingSubjectSerializer(subject.children, many=True)
+        return serializer.data
 
     class Meta:
         model = AccountingSubject

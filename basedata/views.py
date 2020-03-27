@@ -1,5 +1,5 @@
 from django.db.models import Q
-from rest_framework import filters, status, viewsets
+from rest_framework import filters, mixins, status, viewsets
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,11 +8,11 @@ from basedata.models import (
     AccountingSubject, Concept, Industry, Report, ReportItem, ReportType,
     Section, Stock, Territory, XReport, XReportItem)
 from basedata.serializers import (AccountingSubjectSerializer,
-                                  ConceptSerializer,
-                                  IndustrySerializer, ReportItemSerializer,
-                                  ReportSerializer, ReportTypeSerializer,
-                                  SectionSerializer, StockSerializer,
-                                  TerritorySerializer, XReportSerializer)
+                                  ConceptSerializer, IndustrySerializer,
+                                  ReportItemSerializer, ReportSerializer,
+                                  ReportTypeSerializer, SectionSerializer,
+                                  StockSerializer, TerritorySerializer,
+                                  XReportSerializer, ListIndustrySerializer)
 from tdxStock.abstract_models import DynamicModel
 
 
@@ -23,18 +23,30 @@ class StockViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ('code', 'name')
 
 
-class AccountingSubjectViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = AccountingSubject.objects.select_related('report_type')
+class AccountingSubjectViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = AccountingSubject.objects.prefetch_related('children', 'children__children',
+                                                          'children__children__children')\
+        .filter(parent__isnull=True)
     serializer_class = AccountingSubjectSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
+    filter_fields = ('report_type',)
+    pagination_class = None
 
 
-class IndustryViewSet(viewsets.ReadOnlyModelViewSet):
+class IndustryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = Industry.objects.get_queryset()
     serializer_class = IndustrySerializer
     filter_fields = ('type',)
-    pagination_class = None
+
+    """
+    List a queryset.
+    """
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset()\
+                                        .prefetch_related('children', 'children__children',
+                                                          'children__children__children')\
+                                        .filter(parent__isnull=True))
+        serializer = ListIndustrySerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class ConceptViewSet(viewsets.ReadOnlyModelViewSet):

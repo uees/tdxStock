@@ -79,8 +79,6 @@ python manage.py seed_report_types
 
 **params**:
 
-+ `omit`: 排除的字段， 例如 omit=stocks,id
-+ `fileds`: 指定字段
 + `type`: value is `证监会分类` or `申万行业分类`
 
 
