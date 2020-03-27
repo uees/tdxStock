@@ -7,12 +7,11 @@ from rest_framework.views import APIView
 from basedata.models import (
     AccountingSubject, Concept, Industry, Report, ReportItem, ReportType,
     Section, Stock, Territory, XReport, XReportItem)
-from basedata.serializers import (AccountingSubjectSerializer,
-                                  ConceptSerializer, IndustrySerializer,
-                                  ReportItemSerializer, ReportSerializer,
-                                  ReportTypeSerializer, SectionSerializer,
-                                  StockSerializer, TerritorySerializer,
-                                  XReportSerializer, ListIndustrySerializer)
+from basedata.serializers import (
+    AccountingSubjectSerializer, ConceptSerializer, IndustrySerializer,
+    ListIndustrySerializer, ReportItemSerializer, ReportSerializer,
+    ReportTypeSerializer, SectionSerializer, StockSerializer,
+    TerritorySerializer, XReportSerializer)
 from tdxStock.abstract_models import DynamicModel
 
 
@@ -40,10 +39,11 @@ class IndustryViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     """
     List a queryset.
     """
+
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset()\
+        queryset = self.filter_queryset(self.get_queryset()
                                         .prefetch_related('children', 'children__children',
-                                                          'children__children__children')\
+                                                          'children__children__children')
                                         .filter(parent__isnull=True))
         serializer = ListIndustrySerializer(queryset, many=True)
         return Response(serializer.data)

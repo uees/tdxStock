@@ -34,12 +34,15 @@ const state = {
     data: [],
     loading: false,
   },
-  accountingSubjects: {
-    primary_indicator_sheet: {},
-    consolidated_balance_sheet: {},
-    consolidated_income_sheet: {},
-    cash_flow_sheet: {}
-  },
+  accountingSubjects: {},
+}
+
+function get_report_type_slug(reportTypes, id) {
+  for (reportType of reportTypes) {
+    if (reportType.id == id) {
+      return reportType.slug
+    }
+  }
 }
 
 const mutations = {
@@ -52,7 +55,13 @@ const mutations = {
     state.stocks.data[stock.id] = stock
   },
   INIT_SUBJECTS: (state, subjects) => {
-    init_subjects(subjects)
+    for (subject of subjects) {
+      const slug = get_report_type_slug(state.reportTypes, subject.report_type)
+      if (!state.accountingSubjects[slug]) {
+        state.accountingSubjects[slug] = []
+      }
+      state.accountingSubjects[slug].push(subject)
+    }
   }
 }
 
@@ -110,15 +119,15 @@ const actions = {
   },
   async loadReportTypes({ state }, params) {
     state.reportTypes.loading = true
-    const { results } = await reportTypesApi.list({ params })
-    state.reportTypes.data = results
+    const types = await reportTypesApi.list({ params })
+    state.reportTypes.data = types
     state.reportTypes.loading = false
-    return results
+    return types
   },
-  async loadAccountingSubjects({ commit }, params) {
+  async loadAccountingSubjects({ commit, state }, params) {
     const subjects = await subjectsApi.list({ params })
     commit('INIT_SUBJECTS', subjects)
-    return subjects
+    return state.accountingSubjects
   }
 }
 
