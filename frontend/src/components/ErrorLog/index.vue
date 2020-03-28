@@ -26,7 +26,9 @@
           type="primary"
           icon="el-icon-delete"
           @click="clearAll"
-        >Clear All</el-button>
+        >
+          Clear All
+        </el-button>
       </div>
       <el-table
         :data="errorLogs"
@@ -75,18 +77,18 @@
 <script>
 export default {
   name: 'ErrorLog',
-  data() {
+  data () {
     return {
       dialogTableVisible: false
     }
   },
   computed: {
-    errorLogs() {
+    errorLogs () {
       return this.$store.getters.errorLogs
     }
   },
   methods: {
-    clearAll() {
+    clearAll () {
       this.dialogTableVisible = false
       this.$store.dispatch('errorLog/clearErrorLog')
     }

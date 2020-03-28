@@ -1,7 +1,7 @@
 import request from './request'
 
 export default class RestApi {
-  constructor(config) {
+  constructor (config) {
     const options = {
       url: '',
       subPath: '',
@@ -19,7 +19,7 @@ export default class RestApi {
     this.applyApi()
   }
 
-  applyApi() {
+  applyApi () {
     if (this.methods.includes('list')) {
       this.list = (config) => {
         return request.get(this.url, config)

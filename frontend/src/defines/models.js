@@ -1,7 +1,7 @@
 /**
  * 行业
  */
-export function Industry() {
+export function Industry () {
   return {
     id: undefined,
     parent: undefined,
@@ -16,7 +16,7 @@ export function Industry() {
 /**
  * 概念
  */
-export function Concept() {
+export function Concept () {
   return {
     id: undefined,
     name: undefined,
@@ -28,7 +28,7 @@ export function Concept() {
 /**
  * 地域
  */
-export function Territory() {
+export function Territory () {
   return {
     id: undefined,
     name: undefined,
@@ -39,7 +39,7 @@ export function Territory() {
 /**
  * 板块
  */
-export function Section() {
+export function Section () {
   return {
     id: undefined,
     name: undefined,
@@ -51,7 +51,7 @@ export function Section() {
 /**
  * 股票
  */
-export function Stock() {
+export function Stock () {
   return {
     id: undefined,
     name: undefined,
@@ -92,25 +92,25 @@ export function Stock() {
         last_report_date: undefined,
         last_all_report_date: undefined,
         quarter_list: [],
-        all_list: [],
+        all_list: []
       },
       consolidated_balance_sheet: {
         last_report_date: undefined,
         last_all_report_date: undefined,
         quarter_list: [],
-        all_list: [],
+        all_list: []
       },
       consolidated_income_sheet: {
         last_report_date: undefined,
         last_all_report_date: undefined,
         quarter_list: [],
-        all_list: [],
+        all_list: []
       },
       cash_flow_sheet: {
         last_report_date: undefined,
         last_all_report_date: undefined,
         quarter_list: [],
-        all_list: [],
+        all_list: []
       }
     }
   }
@@ -119,7 +119,7 @@ export function Stock() {
 /**
  * 财报类型
  */
-export function ReportType() {
+export function ReportType () {
   return {
     id: undefined,
     name: undefined,
@@ -131,7 +131,7 @@ export function ReportType() {
 /**
  * 会计科目
  */
-export function AccountingSubject() {
+export function AccountingSubject () {
   return {
     id: undefined,
     report_type: undefined,
@@ -145,7 +145,7 @@ export function AccountingSubject() {
 /**
  * 财报
  */
-export function Report() {
+export function Report () {
   return {
     id: undefined,
     items: [],
@@ -154,14 +154,14 @@ export function Report() {
     name: undefined,
     year: undefined,
     quarter: undefined,
-    report_date: undefined,
+    report_date: undefined
   }
 }
 
 /**
  * 财报项目
  */
-export function ReportItem() {
+export function ReportItem () {
   return {
     id: undefined,
     value_number: undefined,
@@ -170,6 +170,6 @@ export function ReportItem() {
     value_unit: undefined,
     subject_id: undefined,
     stock: undefined,
-    quarter: undefined,
+    quarter: undefined
   }
 }

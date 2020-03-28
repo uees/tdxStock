@@ -7,7 +7,7 @@ import settings from '@/settings'
 // errorLog:'production' | ['production', 'development']
 const { errorLog: needErrorLog } = settings
 
-function checkNeed() {
+function checkNeed () {
   const env = process.env.NODE_ENV
   if (isString(needErrorLog)) {
     return env === needErrorLog

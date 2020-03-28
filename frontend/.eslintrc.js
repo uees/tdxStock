@@ -16,11 +16,12 @@ module.exports = {
 
   rules: {
     'no-console': 'off',
-    'no-debugger': 'off'
+    'no-debugger': 'off',
+    camelcase: 'off'
   },
 
-  'extends': [
-    'plugin:vue/essential',
+  extends: [
+    'plugin:vue/strongly-recommended',
     '@vue/standard'
   ]
 }

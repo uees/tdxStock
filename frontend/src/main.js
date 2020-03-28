@@ -7,7 +7,11 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
+import IndustryMenu from './components/IndustryMenu'
+
 import './bootstarp'
+
+Vue.component('industry-menu', IndustryMenu)
 
 Vue.use(ElementUI)
 

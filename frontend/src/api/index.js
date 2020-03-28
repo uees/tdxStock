@@ -61,7 +61,7 @@ export const subjectsApi = new RestApi({
  * 单季报接口
  * @param {object} params
  */
-export function get_report(params) {
+export function get_report (params) {
   return request.get('/reports/', { params })
 }
 
@@ -69,7 +69,7 @@ export function get_report(params) {
  * 报告期季报接口
  * @param {object} params
  */
-export function get_xreport(params) {
+export function get_xreport (params) {
   return request.get('/xreports/', { params })
 }
 
@@ -77,6 +77,6 @@ export function get_xreport(params) {
  * 比较信息接口
  * @param {object} params
  */
-export function compare_stock(params) {
+export function compare_stock (params) {
   return request.get('/compare/', { params })
 }

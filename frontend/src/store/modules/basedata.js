@@ -12,34 +12,34 @@ import {
 const state = {
   stocks: {
     data: {},
-    loading: false,
+    loading: false
   },
   industries: {
     data: [],
-    loading: false,
+    loading: false
   },
   concepts: {
     data: [],
-    loading: false,
+    loading: false
   },
   sections: {
     data: [],
-    loading: false,
+    loading: false
   },
   territories: {
     data: [],
-    loading: false,
+    loading: false
   },
   reportTypes: {
     data: [],
-    loading: false,
+    loading: false
   },
-  accountingSubjects: {},
+  accountingSubjects: {}
 }
 
 function get_report_type_slug(reportTypes, id) {
-  for (reportType of reportTypes) {
-    if (reportType.id == id) {
+  for (const reportType of reportTypes) {
+    if (reportType.id === id) {
       return reportType.slug
     }
   }
@@ -47,7 +47,7 @@ function get_report_type_slug(reportTypes, id) {
 
 const mutations = {
   SET_STOCKS: (state, stocks) => {
-    for (stock of stocks) {
+    for (const stock of stocks) {
       state.stocks.data[stock.id] = stock
     }
   },
@@ -55,8 +55,8 @@ const mutations = {
     state.stocks.data[stock.id] = stock
   },
   INIT_SUBJECTS: (state, subjects) => {
-    for (subject of subjects) {
-      const slug = get_report_type_slug(state.reportTypes, subject.report_type)
+    for (const subject of subjects) {
+      const slug = get_report_type_slug(state.reportTypes.data, subject.report_type)
       if (!state.accountingSubjects[slug]) {
         state.accountingSubjects[slug] = []
       }

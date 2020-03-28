@@ -7,8 +7,14 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Layout
+    component: Layout,
+    redirect: '/home',
+    children: [{
+      path: 'home',
+      name: 'Home',
+      component: () => import('../views/Home'),
+      meta: { title: '主页' }
+    }]
   },
   {
     path: '/about',
