@@ -37,7 +37,7 @@ export default class RestApi {
         if (!this.url.endsWith('/')) {
           this.url = `${this.url}/`
         }
-        return request.patch(`${this.url}${id}`, obj, config)
+        return request.patch(`${this.url}${id}/`, obj, config)
       }
     }
 
@@ -46,7 +46,7 @@ export default class RestApi {
         if (!this.url.endsWith('/')) {
           this.url = `${this.url}/`
         }
-        return request.delete(`${this.url}${id}`, config)
+        return request.delete(`${this.url}${id}/`, config)
       }
     }
 
@@ -55,7 +55,7 @@ export default class RestApi {
         if (!this.url.endsWith('/')) {
           this.url = `${this.url}/`
         }
-        return request.get(`${this.url}${id}`, config)
+        return request.get(`${this.url}${id}/`, config)
       }
     }
   }

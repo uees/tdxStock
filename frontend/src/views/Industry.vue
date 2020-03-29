@@ -1,35 +1,43 @@
 <template>
   <el-row>
     <el-col :span="24">
-
+      <el-tag
+        v-for="stock in stocks"
+        :key="stock.id"
+        class="stock-tag"
+      >
+        {{ stock.name }}
+      </el-tag>
     </el-col>
   </el-row>
 </template>
 
 <script>
+import { industriesApi } from '@/api'
+
 export default {
   name: 'Industry',
-  data() {
+  props: ['id'],
+  data () {
     return {
-      id: undefined
-    };
+      stocks: []
+    }
   },
-  computed: {
-    ...mapState('basedata', {
-      industries: state => state.industries.data,
-    }),
-  },
-  beforeRouteUpdate (to, from, next) {
-    // react to route changes...
-    // don't forget to call next()
-    this.id = to.params.id
+  created () {
     this.getStocks()
-    next()
   },
   methods: {
-    getStocks() {
-
+    async getStocks () {
+      const industry = await industriesApi.show(this.id)
+      this.stocks = industry.stocks
     }
   }
 }
 </script>
+
+<style scoped>
+.stock-tag {
+  margin-left: 12px;
+  margin-bottom: 12px;
+}
+</style>
