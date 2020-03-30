@@ -25,8 +25,9 @@ class ListIndustrySerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
 
     def get_children(self, industry):
-        serializer = ListIndustrySerializer(industry.children, many=True)
-        return serializer.data
+        if industry.children.exists():
+            serializer = ListIndustrySerializer(industry.children, many=True)
+            return serializer.data
 
     class Meta:
         model = Industry
@@ -85,8 +86,9 @@ class AccountingSubjectSerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
 
     def get_children(self, subject):
-        serializer = AccountingSubjectSerializer(subject.children, many=True)
-        return serializer.data
+        if subject.children.exists():
+            serializer = AccountingSubjectSerializer(subject.children, many=True)
+            return serializer.data
 
     class Meta:
         model = AccountingSubject

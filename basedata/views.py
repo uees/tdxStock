@@ -119,25 +119,28 @@ class CompareView(APIView):
     def get(self, request: Request, format=None):
         stocks = request.query_params.get('stocks')
         subject = request.query_params.get('subject')
-        is_single = request.query_params.get('single', False)  # 是否单季度报
+        is_single = request.query_params.get('single')  # 是否单季度报
         quarter = request.query_params.get('quarter')  # 季度
 
         if not stocks or not subject:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        report_item_class = ReportItem if is_single else XReportItem
-        report_class = Report if is_single else XReport
+        report_item_class = ReportItem if is_single == "true" else XReportItem
+        report_class = Report if is_single == "true" else XReport
 
-        stock_ids = stocks.split(',')
+        stock_ids = stocks.strip(',').split(',')
         # stocks = Stock.objects.filter(id__in=stock_ids).only('id', 'name', 'code').all()
 
         subject = AccountingSubject.objects.get(pk=subject)
 
         # 1. get all reports
-        reports = report_class.objects.filter(stock__in=stock_ids).filter(report_type=subject.report_type).all()
+        reports_queryset = report_class.objects.filter(stock__in=stock_ids).filter(report_type=subject.report_type)
+        if quarter:
+            reports_queryset = reports_queryset.filter(quarter=quarter)
+        reports = reports_queryset.all()
 
         # 2. use reports and subject to select report_items
-        items_queryset = self.get_items_queryset(reports, subject, quarter, report_item_class)
+        items_queryset = self.get_items_queryset(reports, subject, report_item_class)
 
         report_items = items_queryset.all()
 
@@ -145,7 +148,7 @@ class CompareView(APIView):
 
         return Response(serializer.data)
 
-    def get_items_queryset(self, reports, subject, quarter, report_item_class):
+    def get_items_queryset(self, reports, subject, report_item_class):
         queryset = DynamicModel(report_item_class, reports[0].year).objects.none()
         querysets = []
         for report in reports:
@@ -153,9 +156,6 @@ class CompareView(APIView):
             qs = item_model.objects.select_related('report', 'report__stock')\
                 .filter(report=report)\
                 .filter(subject=subject)
-
-            if quarter:
-                qs = qs.filter(report__quarter=quarter)
 
             querysets.append(qs)
 
