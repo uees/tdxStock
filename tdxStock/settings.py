@@ -269,6 +269,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
     'PAGE_SIZE': 10,
     'SEARCH_PARAM': 'q',  # default search
+    'COERCE_DECIMAL_TO_STRING': False,
 }
 
 # 重点，设置信任站点

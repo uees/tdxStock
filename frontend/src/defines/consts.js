@@ -1,5 +1,5 @@
-const NUMBER_TYPE = 1
-const STRING_TYPE = 2
+export const NUMBER_TYPE = 1
+export const STRING_TYPE = 2
 
 export const DATA_TYPES = [
   { value: NUMBER_TYPE, label: '数值' },

@@ -152,7 +152,7 @@ class XReportSerializer(ReportSerializer):
 
 class ReportItemSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
-    value_number = serializers.DecimalField(read_only=True, max_digits=30, decimal_places=4)
+    value_number = serializers.DecimalField(read_only=True, max_digits=28, decimal_places=4)
     value = serializers.CharField(read_only=True, max_length=64, allow_blank=True)
     value_type = serializers.IntegerField(read_only=True)
     value_unit = serializers.IntegerField(read_only=True)

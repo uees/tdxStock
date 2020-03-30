@@ -72,15 +72,26 @@
       <div class="submit-content">
         <el-button type="primary"
                    @click="handleCompare">开始比较</el-button>
+        <el-button type="success"
+                   class="element2"
+                   @click="drawChart">分面</el-button>
+        <el-button type="success"
+                   class="element2"
+                   @click="drawChart2">趋势</el-button>
         <el-button type="info"
                    class="element2">下载数据</el-button>
       </div>
+    </el-col>
+
+    <el-col :span="24">
+      <div id="chart-container"></div>
     </el-col>
   </el-row>
 </template>
 
 <script>
 import { mapState } from 'vuex'
+import { Chart } from '@antv/g2'
 import {compare_stock, industriesApi, conceptsApi} from '../api'
 import StocksForm from '../components/StocksForm'
 
@@ -103,7 +114,8 @@ export default {
         label: 'name',
         children: 'children'
       },
-      compareData: undefined
+      chart: undefined,
+      compareData: []
     }
   },
   computed: {
@@ -159,6 +171,7 @@ export default {
           quarter: this.quarter
         }).then(response => {
           this.compareData = response
+          this.drawChart2()
         })
       } else {
         window.alert("没选择股票，或者没选择会计科目")
@@ -166,6 +179,70 @@ export default {
     },
     clearQuarter() {
       this.quarter = ''
+    },
+    drawChart() {
+      this.chart && this.chart.destroy()
+      // Step 1: 创建 Chart 对象
+      this.chart = new Chart({
+        container: 'chart-container',
+        autoFit: false,
+        width: 1200,
+        height: 600,
+        padding: [0, 100, 0, 40],
+      })
+
+      // Step 2: 载入数据源
+      this.chart.data(this.compareData);
+
+      this.chart.scale({
+        value_number: {
+          sync: true,
+        },
+      });
+
+      // Step 3：创建图形语法，绘制柱状图
+      // this.chart.point().position('quarter*value_number').color('stock');
+      // this.chart.line().position('quarter*value_number').color('stock');
+
+      this.chart.facet('rect', {
+        fields: [null, 'stock'],
+        rowTitle: {
+          style: {
+            textAlign: 'start',
+            fontSize: 12,
+          },
+        },
+        eachView(view) {
+          view.area().position('quarter*value_number');
+          view.line().position('quarter*value_number');
+          view
+            .point()
+            .position('quarter*value_number')
+            .shape('circle');
+        },
+      });
+
+      // Step 4: 渲染图表
+      this.chart.render();
+    },
+    drawChart2() {
+      this.chart && this.chart.destroy()
+      // Step 1: 创建 Chart 对象
+      this.chart = new Chart({
+        container: 'chart-container',
+        width: 1200,
+        height: 600,
+      })
+
+      // Step 2: 载入数据源
+      this.chart.data(this.compareData);
+
+      // Step 3：创建图形语法，绘制柱状图
+      this.chart.point().position('quarter*value_number').color('stock');
+      this.chart.line().position('quarter*value_number').color('stock');
+
+      // Step 4: 渲染图表
+      this.chart.render();
     },
     async get_stocks_by_industry(industry_id) {
       const industry = await industriesApi.show(industry_id)
