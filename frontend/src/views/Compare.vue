@@ -78,16 +78,6 @@
                    @click="handleCompare">
           开始比较
         </el-button>
-        <el-button type="success"
-                   class="element2"
-                   @click="drawChart">
-          分面
-        </el-button>
-        <el-button type="success"
-                   class="element2"
-                   @click="drawChart2">
-          趋势
-        </el-button>
         <el-button type="info"
                    class="element2"
                    @click="handleDownload">
@@ -144,9 +134,6 @@ export default {
       accountingSubjects: state => state.accountingSubjects
     }),
     ...mapState('compare', ['stocks']),
-    stocksString: function () {
-      return ''
-    },
     industry_id: function () {
       return this.industriesValue[this.industriesValue.length - 1]
     },
@@ -234,7 +221,7 @@ export default {
           quarter: this.quarter
         }).then(response => {
           this.compareData = response
-          this.drawChart2()
+          this.drawChart()
         })
       } else {
         window.alert('没选择股票，或者没选择会计科目')
@@ -244,48 +231,6 @@ export default {
       this.quarter = ''
     },
     drawChart () {
-      this.chart && this.chart.destroy()
-      // Step 1: 创建 Chart 对象
-      this.chart = new Chart({
-        container: 'chart-container',
-        autoFit: false,
-        width: 1200,
-        height: 600,
-        padding: [0, 100, 0, 100]
-      })
-
-      // Step 2: 载入数据源
-      this.chart.data(this.compareData)
-
-      this.chart.scale({
-        value_number: {
-          sync: true
-        }
-      })
-
-      // Step 3：创建图形语法
-      this.chart.facet('rect', {
-        fields: [null, 'stock'],
-        rowTitle: {
-          style: {
-            textAlign: 'start',
-            fontSize: 12
-          }
-        },
-        eachView (view) {
-          view.area().position('quarter*value_number')
-          view.line().position('quarter*value_number')
-          view
-            .point()
-            .position('quarter*value_number')
-            .shape('circle')
-        }
-      })
-
-      // Step 4: 渲染图表
-      this.chart.render()
-    },
-    drawChart2 () {
       this.chart && this.chart.destroy()
       // Step 1: 创建 Chart 对象
       this.chart = new Chart({

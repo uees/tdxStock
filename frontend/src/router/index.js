@@ -24,6 +24,13 @@ const routes = [
         meta: { title: '行业' }
       },
       {
+        path: 'reports/:id',
+        name: 'Report',
+        props: true,
+        component: () => import('../views/Report'),
+        meta: { title: '报表' }
+      },
+      {
         path: 'compare',
         name: 'Compare',
         component: () => import('../views/Compare'),

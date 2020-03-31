@@ -1,20 +1,16 @@
 <template>
   <div class="stocks-form">
     <el-button-group style="margin-bottom: 12px">
-      <el-button
-        type="primary"
-        icon="el-icon-edit"
-        size="mini"
-        @click="handleCreate"
-      >
+      <el-button type="primary"
+                 icon="el-icon-edit"
+                 size="mini"
+                 @click="handleCreate">
         添加
       </el-button>
-      <el-button
-        type="primary"
-        icon="el-icon-close"
-        size="mini"
-        @click="handleClear"
-      >
+      <el-button type="primary"
+                 icon="el-icon-close"
+                 size="mini"
+                 @click="handleClear">
         清除所有
       </el-button>
     </el-button-group>
@@ -22,29 +18,23 @@
     <el-table :data="stocks">
       <el-table-column label="股票">
         <template slot-scope="scope">
-          <el-autocomplete
-            v-model="scope.row.name"
-            :fetch-suggestions="querySearchAsync"
-            label="name"
-            value-key="name"
-            placeholder="请输入内容"
-            @select="handleSelect(scope)"
-          />
+          <el-autocomplete v-model="scope.row.name"
+                           :fetch-suggestions="querySearchAsync"
+                           label="name"
+                           value-key="name"
+                           placeholder="请输入内容"
+                           @select="handleSelect" />
         </template>
       </el-table-column>
 
-      <el-table-column
-        align="center"
-        label="操作"
-        width="220"
-      >
+      <el-table-column align="center"
+                       label="操作"
+                       width="220">
         <template slot-scope="scope">
-          <el-button
-            type="danger"
-            icon="el-icon-delete"
-            size="small"
-            @click="handleDelete(scope)"
-          >
+          <el-button type="danger"
+                     icon="el-icon-delete"
+                     size="small"
+                     @click="handleDelete(scope)">
             Delete
           </el-button>
         </template>
@@ -81,14 +71,9 @@ export default {
     handleClear () {
       this.$store.commit('compare/SET_STOCKS', [Stock()])
     },
-    handleSelect (scope) {
-      return (stock) => {
-        if (this.stocks.findIndex(element => element.id === stock.id) === -1) {
-          this.$store.commit('compare/UPDATE_STOCK', {
-            index: scope.$index,
-            stock: stock
-          })
-        }
+    handleSelect (stock) {
+      if (this.stocks.findIndex(element => element.id === stock.id) === -1) {
+        this.$store.commit('compare/ADD_STOCK', stock)
       }
     },
     async querySearchAsync (queryString, cb) {
