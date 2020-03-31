@@ -7,23 +7,29 @@
           <el-option v-for="item in reportTypes"
                      :key="item.slug"
                      :label="item.name"
-                     :value="item.slug">
-          </el-option>
+                     :value="item.slug" />
         </el-select>
 
         <el-cascader v-model="subjectsValue"
                      :options="accountingSubjects[reportType]"
                      :props="props"
-                     class="element2"></el-cascader>
+                     class="element2"
+                     @change="handleChangeSubject" />
       </div>
     </el-col>
 
     <el-col :span="24">
       <el-radio-group v-model="compareType"
                       style="margin-bottom: 30px;">
-        <el-radio-button label="industry">行业</el-radio-button>
-        <el-radio-button label="concept">概念</el-radio-button>
-        <el-radio-button label="stock">Stock</el-radio-button>
+        <el-radio-button label="industry">
+          行业
+        </el-radio-button>
+        <el-radio-button label="concept">
+          概念
+        </el-radio-button>
+        <el-radio-button label="stock">
+          Stock
+        </el-radio-button>
       </el-radio-group>
     </el-col>
 
@@ -33,7 +39,7 @@
                      v-show="compareType === 'industry'"
                      :options="industries"
                      :props="props"
-                     @change="handleChangeIndustry"></el-cascader>
+                     @change="handleChangeIndustry" />
         <stocks-form v-show="compareType === 'stock'" />
         <el-select v-model="concept_id"
                    v-show="compareType === 'concept'"
@@ -42,8 +48,7 @@
           <el-option v-for="concept in concepts"
                      :key="concept.id"
                      :label="concept.name"
-                     :value="concept.id">
-          </el-option>
+                     :value="concept.id" />
         </el-select>
       </div>
     </el-col>
@@ -66,25 +71,33 @@
 
       <el-switch v-model="is_single"
                  class="element2"
-                 active-text="单季度">
-      </el-switch>
+                 active-text="单季度" />
 
       <div class="submit-content">
         <el-button type="primary"
-                   @click="handleCompare">开始比较</el-button>
+                   @click="handleCompare">
+          开始比较
+        </el-button>
         <el-button type="success"
                    class="element2"
-                   @click="drawChart">分面</el-button>
+                   @click="drawChart">
+          分面
+        </el-button>
         <el-button type="success"
                    class="element2"
-                   @click="drawChart2">趋势</el-button>
+                   @click="drawChart2">
+          趋势
+        </el-button>
         <el-button type="info"
-                   class="element2">下载数据</el-button>
+                   class="element2"
+                   @click="handleDownload">
+          下载数据
+        </el-button>
       </div>
     </el-col>
 
     <el-col :span="24">
-      <div id="chart-container"></div>
+      <div id="chart-container" />
     </el-col>
   </el-row>
 </template>
@@ -92,7 +105,7 @@
 <script>
 import { mapState } from 'vuex'
 import { Chart } from '@antv/g2'
-import {compare_stock, industriesApi, conceptsApi} from '../api'
+import { compare_stock, industriesApi, conceptsApi } from '../api'
 import StocksForm from '../components/StocksForm'
 
 export default {
@@ -100,7 +113,7 @@ export default {
   components: {
     StocksForm
   },
-  data() {
+  data () {
     return {
       quarter: '',
       is_single: false,
@@ -115,7 +128,10 @@ export default {
         children: 'children'
       },
       chart: undefined,
-      compareData: []
+      compareData: [],
+      industry: undefined,
+      subject: undefined,
+      concept: undefined
     }
   },
   computed: {
@@ -125,19 +141,19 @@ export default {
       concepts: state => state.concepts.data,
       industries: state => state.industries.data,
       reportTypes: state => state.reportTypes.data,
-      accountingSubjects: state => state.accountingSubjects,
+      accountingSubjects: state => state.accountingSubjects
     }),
     ...mapState('compare', ['stocks']),
-    stocksString: function() {
+    stocksString: function () {
       return ''
     },
-    industry_id: function() {
+    industry_id: function () {
       return this.industriesValue[this.industriesValue.length - 1]
     },
-    subject_id: function() {
+    subject_id: function () {
       return this.subjectsValue[this.subjectsValue.length - 1]
     },
-    stocks_str: function() {
+    stocks_str: function () {
       const ids = []
       for (const stock of this.stocks) {
         if (stock && stock.id) {
@@ -145,24 +161,71 @@ export default {
         }
       }
       return ids.join(',')
+    },
+    filename: function () {
+      let result = `${this.reportType}-${this.subject.name}`
+
+      if (this.industry) {
+        result = `${this.industry.name}-${result}`
+      }
+
+      if (this.concept) {
+        result = `${this.concept.name}-${result}`
+      }
+
+      return result
     }
   },
   methods: {
-    handleChangeIndustry(value) {
+    handleDownload () {
+      import('../vendor/Export2Excel').then(excel => {
+        const tHeader = ['公司', '季度', '数据']
+        const data = this.compareData2json()
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: this.filename,
+          autoWidth: true,
+          bookType: 'xlsx'
+        })
+        this.downloadLoading = false
+      })
+    },
+    compareData2json () {
+      return this.compareData.map(item => {
+        return [
+          item.stock,
+          item.quarter,
+          item.value_number
+        ]
+      })
+    },
+    handleChangeIndustry (value) {
+      this.concept = undefined
       if (this.industry_id) {
         this.get_stocks_by_industry(this.industry_id).then(stocks => {
           this.$store.commit('compare/SET_STOCKS', stocks)
         })
       }
     },
-    handleChangeConcept(value) {
+    handleChangeConcept (value) {
+      this.industry = undefined
       if (this.concept_id) {
         this.get_stocks_by_concept(this.concept_id).then(stocks => {
           this.$store.commit('compare/SET_STOCKS', stocks)
         })
       }
     },
-    handleCompare() {
+    handleChangeSubject (value) {
+      let subjects = this.accountingSubjects[this.reportType]
+      let subject
+      for (const id of value) {
+        subject = subjects.find(subject => subject.id === id)
+        subjects = subject.children
+      }
+      this.subject = subject
+    },
+    handleCompare () {
       if (this.stocks_str && this.subject_id) {
         compare_stock({
           stocks: this.stocks_str,
@@ -174,13 +237,13 @@ export default {
           this.drawChart2()
         })
       } else {
-        window.alert("没选择股票，或者没选择会计科目")
+        window.alert('没选择股票，或者没选择会计科目')
       }
     },
-    clearQuarter() {
+    clearQuarter () {
       this.quarter = ''
     },
-    drawChart() {
+    drawChart () {
       this.chart && this.chart.destroy()
       // Step 1: 创建 Chart 对象
       this.chart = new Chart({
@@ -188,17 +251,17 @@ export default {
         autoFit: false,
         width: 1200,
         height: 600,
-        padding: [0, 100, 0, 100],
+        padding: [0, 100, 0, 100]
       })
 
       // Step 2: 载入数据源
-      this.chart.data(this.compareData);
+      this.chart.data(this.compareData)
 
       this.chart.scale({
         value_number: {
-          sync: true,
-        },
-      });
+          sync: true
+        }
+      })
 
       // Step 3：创建图形语法
       this.chart.facet('rect', {
@@ -206,49 +269,49 @@ export default {
         rowTitle: {
           style: {
             textAlign: 'start',
-            fontSize: 12,
-          },
+            fontSize: 12
+          }
         },
-        eachView(view) {
-          view.area().position('quarter*value_number');
-          view.line().position('quarter*value_number');
+        eachView (view) {
+          view.area().position('quarter*value_number')
+          view.line().position('quarter*value_number')
           view
             .point()
             .position('quarter*value_number')
-            .shape('circle');
-        },
-      });
+            .shape('circle')
+        }
+      })
 
       // Step 4: 渲染图表
-      this.chart.render();
+      this.chart.render()
     },
-    drawChart2() {
+    drawChart2 () {
       this.chart && this.chart.destroy()
       // Step 1: 创建 Chart 对象
       this.chart = new Chart({
         container: 'chart-container',
         width: 1200,
-        height: 600,
+        height: 600
       })
 
       // Step 2: 载入数据源
-      this.chart.data(this.compareData);
+      this.chart.data(this.compareData)
 
       // Step 3：创建图形语法，绘制柱状图
-      this.chart.point().position('quarter*value_number').color('stock');
-      this.chart.line().position('quarter*value_number').color('stock');
+      this.chart.point().position('quarter*value_number').color('stock')
+      this.chart.line().position('quarter*value_number').color('stock')
 
       // Step 4: 渲染图表
-      this.chart.render();
+      this.chart.render()
     },
-    async get_stocks_by_industry(industry_id) {
-      const industry = await industriesApi.show(industry_id)
-      return industry.stocks
+    async get_stocks_by_industry (industry_id) {
+      this.industry = await industriesApi.show(industry_id)
+      return this.industry.stocks
     },
-    async get_stocks_by_concept(concept_id) {
-      const concept = await conceptsApi.show(concept_id)
-      return concept.stocks
-    },
+    async get_stocks_by_concept (concept_id) {
+      this.concept = await conceptsApi.show(concept_id)
+      return this.concept.stocks
+    }
   }
 }
 </script>
