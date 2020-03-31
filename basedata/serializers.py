@@ -161,7 +161,16 @@ class ReportItemSerializer(serializers.Serializer):
     quarter = serializers.SerializerMethodField()
 
     def get_quarter(self, item):
-        return f"{item.report.year}-{item.report.quarter}"
+        """返回的是时间字符串"""
+        if item.report.quarter == 1:
+            quarter = '03-30'
+        elif item.report.quarter == 2:
+            quarter = '06-30'
+        elif item.report.quarter == 3:
+            quarter = '09-30'
+        elif item.report.quarter == 4:
+            quarter = '12-30'
+        return f"{item.report.year}-{quarter}"
 
     def get_stock(self, item):
         return item.report.stock.name
