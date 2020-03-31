@@ -188,7 +188,7 @@ export default {
         autoFit: false,
         width: 1200,
         height: 600,
-        padding: [0, 100, 0, 40],
+        padding: [0, 100, 0, 100],
       })
 
       // Step 2: 载入数据源
@@ -200,10 +200,7 @@ export default {
         },
       });
 
-      // Step 3：创建图形语法，绘制柱状图
-      // this.chart.point().position('quarter*value_number').color('stock');
-      // this.chart.line().position('quarter*value_number').color('stock');
-
+      // Step 3：创建图形语法
       this.chart.facet('rect', {
         fields: [null, 'stock'],
         rowTitle: {
