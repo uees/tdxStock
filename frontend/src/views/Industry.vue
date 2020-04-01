@@ -1,12 +1,10 @@
 <template>
   <el-row>
     <el-col :span="24">
-      <el-tag
-        v-for="stock in stocks"
-        :key="stock.id"
-        class="stock-tag"
-      >
-        {{ stock.name }}
+      <el-tag v-for="stock in stocks"
+              :key="stock.id"
+              class="stock-tag">
+        <router-link :to="'/reports/' + stock.id">{{ stock.name }}</router-link>
       </el-tag>
     </el-col>
   </el-row>

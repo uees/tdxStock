@@ -4,11 +4,15 @@
       <el-button type="primary"
                  icon="el-icon-edit"
                  size="mini"
-                 @click="handleCreate"> 添加 </el-button>
+                 @click="handleCreate">
+        添加
+      </el-button>
       <el-button type="primary"
                  icon="el-icon-close"
                  size="mini"
-                 @click="handleClear"> 清除所有 </el-button>
+                 @click="handleClear">
+        清除所有
+      </el-button>
     </el-button-group>
 
     <el-table :data="stocks">
@@ -19,7 +23,8 @@
                            label="name"
                            value-key="name"
                            placeholder="请输入内容"
-                           @select="handleSelect(scope)"></el-autocomplete>
+                           @focus="onFocus(scope.$index)"
+                           @select="handleSelect" />
         </template>
       </el-table-column>
 
@@ -30,7 +35,9 @@
           <el-button type="danger"
                      icon="el-icon-delete"
                      size="small"
-                     @click="handleDelete(scope)">Delete</el-button>
+                     @click="handleDelete(scope)">
+            Delete
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -39,12 +46,12 @@
 
 <script>
 import { mapState } from 'vuex'
-import {Stock} from '../defines/models'
-import {stocksApi} from '../api'
+import { Stock } from '../defines/models'
+import { stocksApi } from '../api'
 
 export default {
   name: 'StocksForm',
-  data() {
+  data () {
     return {
 
     }
@@ -56,27 +63,28 @@ export default {
     ])
   },
   methods: {
-    handleCreate() {
+    handleCreate () {
       this.$store.commit('compare/ADD_STOCK', Stock())
     },
-    handleDelete(scope) {
+    handleDelete (scope) {
       this.$store.commit('compare/DELETE_STOCK', scope.$index)
     },
-    handleClear() {
-      this.$store.commit('compare/SET_STOCKS', [Stock(),])
+    handleClear () {
+      this.$store.commit('compare/SET_STOCKS', [Stock()])
     },
-    handleSelect(scope) {
-      return (stock) => {
-        if (this.stocks.findIndex(element => element.id === stock.id) === -1) {
-          this.$store.commit('compare/UPDATE_STOCK', {
-            index: scope.$index,
-            stock: stock
-          })
-        }
+    handleSelect (stock) {
+      if (this.stocks.findIndex(element => element.id === stock.id) === -1) {
+        this.$store.commit('compare/UPDATE_STOCK', {
+          index: this.index,
+          stock
+        })
       }
     },
-    async querySearchAsync(queryString, cb) {
-      const {results} = await stocksApi.list({ params: {q: queryString} })
+    onFocus(index) {
+      this.$store.commit('compare/SET_INDEX', index)
+    },
+    async querySearchAsync (queryString, cb) {
+      const { results } = await stocksApi.list({ params: { q: queryString } })
       cb(results)
     }
   }

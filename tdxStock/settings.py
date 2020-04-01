@@ -31,7 +31,10 @@ DEBUG = env('DEBUG', cast=bool, default=True)
 
 SQL_DEBUG = DEBUG
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+]
 
 # Application definition
 
@@ -156,6 +159,7 @@ STATICFILES_DIRS = (
     ('css', public_root('static/css')),
     ('js', public_root('static/js')),
     ('img', public_root('static/img')),
+    ('fonts', public_root('static/fonts'))
 )
 
 # 允许使用用户名或密码登录
@@ -278,5 +282,7 @@ CORS_ORIGIN_WHITELIST = (
     'http://localhost',
     'http://127.0.0.1:8081',
     'http://localhost:8081',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
 )
 CORS_ALLOW_CREDENTIALS = True  # 指明在跨域访问中，后端是否支持对cookie的操作。

@@ -1,0 +1,6 @@
+app.*.css
+chunk-*.css
+app.*.js
+app.*.js.map
+chunk-*.js
+chunk-*.js.map
