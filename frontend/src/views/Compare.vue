@@ -242,6 +242,19 @@ export default {
       // Step 2: 载入数据源
       this.chart.data(this.compareData)
 
+      // 度量定义
+      this.chart.scale({
+        value_number: {
+          type: 'linear', // 线性度量
+          formatter: function(value, index) {
+            if (value) {
+              return Number(value).toLocaleString()
+            }
+            return value
+          }
+        }
+      })
+
       // Step 3：创建图形语法，绘制柱状图
       this.chart.point().position('quarter*value_number').color('stock')
       this.chart.line().position('quarter*value_number').color('stock')
