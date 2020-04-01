@@ -32,7 +32,7 @@
 
         <el-cascader v-model="subjectsValue"
                      :options="accountingSubjects[reportType]"
-                     :props="Object.assign(props, { checkStrictly: true })"
+                     :props="Object.assign({}, props, { checkStrictly: true })"
                      class="element2"
                      @change="handleChangeSubject" />
       </div>
@@ -171,7 +171,7 @@ export default {
           quarter: this.quarter
         }).then(response => {
           this.compareData = response.map(item => {
-            if (item.value_type === 1 && item.value_number === null) {
+            if (item.value_number === null) {
               item.value_number = 0
             }
             return item
