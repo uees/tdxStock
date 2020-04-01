@@ -130,7 +130,7 @@ export default {
     },
     handleDownload () {
       import('../vendor/Export2Excel').then(excel => {
-        const tHeader = ['公司', '季度', '数据']
+        const tHeader = ['公司', '季度', '数据', 'Str', 'DataType']
         const data = this.compareData2json()
         excel.export_json_to_excel({
           header: tHeader,
@@ -146,8 +146,10 @@ export default {
       return this.compareData.map(item => {
         return [
           item.stock,
-          item.quarter,
-          item.value_number
+          new Date(item.quarter.replace(/-/g,'/')),
+          item.value_number,
+          item.value,
+          item.value_type
         ]
       })
     },
@@ -168,7 +170,12 @@ export default {
           is_single: this.is_single,
           quarter: this.quarter
         }).then(response => {
-          this.compareData = response
+          this.compareData = response.map(item => {
+            if (item.value_type === 1 && item.value_number === null) {
+              item.value_number = 0
+            }
+            return item
+          })
           this.drawChart()
         })
       } else {
