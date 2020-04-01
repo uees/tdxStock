@@ -2,6 +2,25 @@
   <el-row>
     <el-col :span="24">
       <h1>{{stock.name}} {{stock.code}}</h1>
+
+      <div class="xueqiu-data"
+           style="margin-bottom: 24px">
+        <a :href="`https://xueqiu.com/S/${stock.code}`"
+           target="_blank">K线</a>
+        <a :href="`https://xueqiu.com/snowman/S/${stock.code}/detail#/ZYCWZB`"
+           target="_blank"
+           class="element2">主要指标</a>
+        <a :href="`https://xueqiu.com/snowman/S/${stock.code}/detail#/GSLRB`"
+           target="_blank"
+           class="element2">利润表</a>
+        <a :href="`https://xueqiu.com/snowman/S/${stock.code}/detail#/ZCFZB`"
+           target="_blank"
+           class="element2">资产负债表</a>
+        <a :href="`https://xueqiu.com/snowman/S/${stock.code}/detail#/XJLLB`"
+           target="_blank"
+           class="element2">现金流量表</a>
+      </div>
+
       <div class="report-type-content">
         <el-select v-model="reportType"
                    placeholder="请选择报表类型">
