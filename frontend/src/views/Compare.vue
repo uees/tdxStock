@@ -12,7 +12,7 @@
 
         <el-cascader v-model="subjectsValue"
                      :options="accountingSubjects[reportType]"
-                     :props="props"
+                     :props="Object.assign(props, { checkStrictly: true })"
                      class="element2"
                      @change="handleChangeSubject" />
       </div>
