@@ -23,6 +23,7 @@
                            label="name"
                            value-key="name"
                            placeholder="请输入内容"
+                           @focus="onFocus(scope.$index)"
                            @select="handleSelect" />
         </template>
       </el-table-column>
@@ -73,8 +74,14 @@ export default {
     },
     handleSelect (stock) {
       if (this.stocks.findIndex(element => element.id === stock.id) === -1) {
-        this.$store.commit('compare/ADD_STOCK', stock)
+        this.$store.commit('compare/UPDATE_STOCK', {
+          index: this.index,
+          stock
+        })
       }
+    },
+    onFocus(index) {
+      this.$store.commit('compare/SET_INDEX', index)
     },
     async querySearchAsync (queryString, cb) {
       const { results } = await stocksApi.list({ params: { q: queryString } })
