@@ -222,12 +222,7 @@ export default {
           is_single: this.is_single,
           quarter: this.quarter
         }).then(response => {
-          this.compareData = response.map(item => {
-            if (item.value_number === null) {
-              item.value_number = 0
-            }
-            return item
-          })
+          this.compareData = response
           this.drawChart()
         })
       } else {
@@ -247,7 +242,12 @@ export default {
       })
 
       // Step 2: 载入数据源
-      this.chart.data(this.compareData)
+      this.chart.data(this.compareData.map(item => {
+        if (item.value_number === null) {
+          item.value_number = 0
+        }
+        return item
+      }))
 
       // 度量定义
       this.chart.scale({
