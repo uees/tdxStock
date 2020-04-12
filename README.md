@@ -53,7 +53,7 @@ scrapy crawl report -a quarter=S0 -a crawl_mode=append -a report=balance
 如果发现有数据丢失，可以修复数据：
 
 ```
-scrapy crawl stock_report -a quarter=S0 -a report=balance
+scrapy crawl stock_report -a quarter=S0 -a report=balance -a code=SZ300576
 ```
 
 
