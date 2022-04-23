@@ -47,7 +47,7 @@ def dict_merge(target: dict, origin: dict):
 
 def read_cookie(name):
     path = os.path.join(os.path.join(BASE_DIR, 'storage/cookies'), name)
-    with open(path, 'r') as f:
+    with open(path, 'r', encoding="utf-8") as f:
         cookie_str = f.readline()
 
     return string2dict(cookie_str)

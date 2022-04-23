@@ -162,6 +162,7 @@ class ReportItemSerializer(serializers.Serializer):
 
     def get_quarter(self, item):
         """返回的是时间字符串"""
+        quarter = '1-1'
         if item.report.quarter == 1:
             quarter = '03-30'
         elif item.report.quarter == 2:

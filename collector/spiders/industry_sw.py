@@ -6,7 +6,7 @@ import scrapy
 from selenium import webdriver
 
 from basedata.models import Industry
-from fetchdata.utils import get_params, timestamp
+from collector.utils import get_params, timestamp
 from tdxStock.helpers import read_cookie
 
 

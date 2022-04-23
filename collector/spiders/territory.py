@@ -3,38 +3,37 @@ from urllib.parse import urlencode
 
 import scrapy
 
-from basedata.models import Concept
-from fetchdata.utils import get_params
+from basedata.models import Territory
+from collector.utils import get_params
 from tdxStock.helpers import string2dict
 
 
-class ConceptSpider(scrapy.Spider):
-    name = 'concept'
+class TerritorySpider(scrapy.Spider):
+    name = 'territory'
     allowed_domains = ['163.com']
-    start_urls = ['http://quotes.money.163.com/old/']
+    start_urls = ['http://quotes.money.163.com/old/#HS']
     api = 'http://quotes.money.163.com/hs/service/diyrank.php'
     headers = {
         'X-Requested-With': 'XMLHttpRequest',
         'Referer': 'http://quotes.money.163.com/old/',
     }
 
-    def stock_list_request(self, concept_id, params):
+    def stock_list_request(self, territory_id, params):
         url = "%s?%s" % (self.api, urlencode(params))
         return scrapy.Request(
             url,
             headers=self.headers,
             callback=self.parse_stocks,
-            meta={"concept_id": concept_id}
+            meta={"territory_id": territory_id}
         )
 
     def parse(self, response):
-        top_sel = response.xpath('//*[@id="f0-f4"]')
+        top_sel = response.xpath('//*[@id="f0-f5"]')
 
         for sel in top_sel.xpath('ul/li'):
-            name = sel.xpath('a/text()').get()
-            if name:
-                # 这里数据量少, 允许阻塞
-                concept, _ = Concept.objects.get_or_create(name=name.strip())
+            territory_name = sel.xpath('a/text()').get()
+            if territory_name:
+                territory, _ = Territory.objects.get_or_create(name=territory_name.strip())
 
                 qcond = sel.xpath('./@qcond').get()
                 qcond = string2dict(qcond, eq=':')
@@ -52,15 +51,15 @@ class ConceptSpider(scrapy.Spider):
                     "count": qcond['count'],
                 }
 
-                yield self.stock_list_request(concept.id, params)
+                yield self.stock_list_request(territory.id, params)
 
     def parse_stocks(self, response):
         body = json.loads(response.body)
-        concept_id = response.meta['concept_id']
+        territory_id = response.meta['territory_id']
         stock_list = body.get('list', [])
         for stock in stock_list:
             yield {
-                'concept_id': concept_id,
+                'territory_id': territory_id,
                 'name': stock.get('SNAME'),
                 'code': stock.get('SYMBOL')
             }
@@ -70,4 +69,4 @@ class ConceptSpider(scrapy.Spider):
         page = int(params['page'])
         if pagecount > page:
             params.update({"page": page + 1})
-            yield self.stock_list_request(concept_id, params)
+            yield self.stock_list_request(territory_id, params)

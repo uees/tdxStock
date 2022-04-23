@@ -4,25 +4,25 @@ from django import template
 from django.conf import settings
 from django.template.defaultfilters import stringfilter
 
-
+# Get an instance of a logger
 logger = logging.getLogger(__name__)
 
 register = template.Library()
 
 
 @register.simple_tag
-def timeformat(data):
+def timeformat(time_data):
     try:
-        return data.strftime(settings.TIME_FORMAT)
+        return time_data.strftime(settings.TIME_FORMAT)
     except Exception as e:
         logger.error(e)
         return ""
 
 
 @register.simple_tag
-def datetimeformat(data):
+def datetimeformat(datetime_data):
     try:
-        return data.strftime(settings.DATE_TIME_FORMAT)
+        return datetime_data.strftime(settings.DATE_TIME_FORMAT)
     except Exception as e:
         logger.error(e)
         return ""
@@ -30,7 +30,7 @@ def datetimeformat(data):
 
 @register.filter(is_safe=True)
 @stringfilter
-def truncate(content):
+def truncate(content: str):
     from django.utils.html import strip_tags
 
     return strip_tags(content)[:150]

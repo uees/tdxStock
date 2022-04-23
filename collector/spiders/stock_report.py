@@ -1,5 +1,5 @@
 from basedata.models import Stock
-from fetchdata.spiders.report import ReportSpider
+from collector.spiders.report import ReportSpider
 
 
 class StockReportSpider(ReportSpider):

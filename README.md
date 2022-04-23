@@ -1,4 +1,4 @@
-#tdxStock
+# tdxStock
 
 最终目标：打造一个分析系统。
 
@@ -13,19 +13,19 @@ scrapy crawl stock_detail
 #### 采集地域信息
 
 ```
-scrapy crawl territory // 网易数据不更新
+scrapy crawl territory
 ```
 
 #### 采集概念信息
 
 ```
-scrapy crawl concept  // 网易数据不更新
+scrapy crawl concept
 ```
 
 #### 采集行业信息
 
 ```
-scrapy crawl industry_zjh  // 网易数据不更新
+scrapy crawl industry_zjh
 
 scrapy crawl industry_sw
 ```

@@ -20,4 +20,4 @@ class Concept(Timestamp):
         return self.name
 
     def get_absolute_url(self):
-        reverse('wiki:concept-detail', kwargs={'pk': self.id})
+        reverse('wiki:concept-detail', kwargs={'pk': self.pk})

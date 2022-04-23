@@ -1,4 +1,4 @@
-# Scrapy settings for fetchdata project
+# Scrapy settings for collector project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -21,10 +21,10 @@ BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 env = environ.Env(DEBUG=(bool, False), )
 env.read_env(os.path.join(BASE_DIR, '.env'))  # reading .env file
 
-BOT_NAME = 'fetchdata'
+BOT_NAME = 'collector'
 
-SPIDER_MODULES = ['fetchdata.spiders']
-NEWSPIDER_MODULE = 'fetchdata.spiders'
+SPIDER_MODULES = ['collector.spiders']
+NEWSPIDER_MODULE = 'collector.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = env('USER_AGENT')
@@ -51,22 +51,24 @@ CONCURRENT_REQUESTS = env('CONCURRENT_REQUESTS', cast=int, default=16)
 
 # Override the default request headers:
 DEFAULT_REQUEST_HEADERS = {
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept': '*/*',
+    'Accept-Encoding': 'gzip, deflate, br',
     'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+    'cache-control': 'no-cache',
     'Connection': 'keep-alive',
 }
 
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 SPIDER_MIDDLEWARES = {
-    # 'fetchdata.middlewares.FetchdataSpiderMiddleware': 543,
-    'fetchdata.middlewares.SeleniumMiddleware': 543,
+    # 'collector.middlewares.FetchdataSpiderMiddleware': 543,
+    'collector.middlewares.SeleniumMiddleware': 543,
 }
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    'fetchdata.middlewares.FetchdataDownloaderMiddleware': 543,
+    'collector.middlewares.FetchdataDownloaderMiddleware': 543,
 }
 
 # Enable or disable extensions
@@ -78,11 +80,11 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'fetchdata.pipelines.StockPipeline': 300,
-    'fetchdata.pipelines.IndustryPipeline': 300,
-    'fetchdata.pipelines.ConceptPipeline': 300,
-    'fetchdata.pipelines.TerritoryPipeline': 300,
-    'fetchdata.pipelines.ReportPipeline': 300,
+    'collector.pipelines.StockPipeline': 300,
+    'collector.pipelines.IndustryPipeline': 300,
+    'collector.pipelines.ConceptPipeline': 300,
+    'collector.pipelines.TerritoryPipeline': 300,
+    'collector.pipelines.ReportPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

@@ -14,7 +14,7 @@ class User(AbstractUser):
     updated_at = models.DateTimeField('更新时间', default=timezone.now)
 
     def __str__(self):
-        return self.email
+        return f"{self.nickname}({self.email})"
 
     def save(self, *args, **kwargs):
         if not self.avatar:
@@ -24,4 +24,4 @@ class User(AbstractUser):
     def change_avatar(self):
         g = Generator(9, 9, foreground=settings.IDENTICON_FOREGROUND)
         data = base64.b64encode(g.generate(self.email, 256, 256, output_format='gif'))
-        self.avatar = 'data:image/gif;base64,%s' % data
+        self.avatar = f'data:image/gif;base64,{data}'

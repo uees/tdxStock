@@ -388,7 +388,7 @@ CodeMirror.defineMode("perl",function(){
                 rand                            :1,     // - retrieve the next pseudorandom number
                 read                            :1,     // - fixed-length buffered input from a filehandle
                 readdir                         :1,     // - get a directory from a directory handle
-                readline                        :1,     // - fetch a record from a file
+                readline                        :1,     // - collector a record from a file
                 readlink                        :1,     // - determine where a symbolic link is pointing
                 readpipe                        :1,     // - execute a system command and collect standard output
                 recv                            :1,     // - receive a message over a Socket

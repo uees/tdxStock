@@ -5,8 +5,8 @@ from urllib.parse import urlencode
 import scrapy
 
 from basedata.models import Stock
-from fetchdata.items import ReportItem
-from fetchdata.utils import (fromtimestamp, get_quarter_date,
+from collector.items import ReportItem
+from collector.utils import (fromtimestamp, get_quarter_date,
                              parse_report_name, timestamp)
 from tdxStock.helpers import read_cookie, str_fix_null
 

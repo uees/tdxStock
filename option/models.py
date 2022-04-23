@@ -1,11 +1,9 @@
 from django.db import models
 
-from tdxStock.fields import JSONField
-
 
 class Option(models.Model):
     name = models.CharField('项目', max_length=200, unique=True)
-    value = JSONField('值', null=True, blank=True)
+    value = models.JSONField('值', null=True, blank=True)
     enable = models.BooleanField(default=True)
 
     class Meta:
@@ -16,26 +14,17 @@ class Option(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
-    _options = None  # 缓存查询结果
-
-    @classmethod
-    def query_options(cls, names):
-        if isinstance(names, str):
-            names = [names, ]
-
-        cls._options = cls.objects.filter(name__in=names).all()
-        return cls._options
+    _options = {}  # cache
 
     @classmethod
     def get_option(cls, name, default=None):
-        if not cls._options:
-            raise Exception('Option.query_options(names) is not called, or option.query_options(names) returns nothing')
+        if name in cls._options:
+            return cls._options[name]
 
-        for option in cls._options:
-            if option.name == name:
-                return option.value
+        o = cls.objects.filter(enable=True).filter(name=name).first()
+
+        if o:
+            cls._options[name] = o.value
+            return o.value
 
         return default

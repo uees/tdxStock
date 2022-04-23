@@ -4,8 +4,8 @@ from urllib.parse import urlencode
 
 import scrapy
 
-from fetchdata.items import StockItem
-from fetchdata.utils import get_params, timestamp
+from collector.items import StockItem
+from collector.utils import get_params, timestamp
 from tdxStock.helpers import read_cookie
 
 
