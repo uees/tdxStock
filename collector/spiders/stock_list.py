@@ -3,6 +3,7 @@ import time
 from urllib.parse import urlencode
 
 import scrapy
+from xpinyin import Pinyin
 
 from collector.items import StockItem
 from collector.utils import get_params, timestamp
@@ -58,9 +59,12 @@ class StockSpider(scrapy.Spider):
         if page * per_page < count:
             yield self.stock_list_request(page + 1, per_page)
 
+        p = Pinyin()
         for stock in data.get('list', []):
+            stock_name = stock.get('name')
             item = StockItem()
-            item['name'] = stock.get('name')
+            item['name'] = stock_name
+            item["pinyin"] = p.get_initials(stock_name, "")
             item['code'] = stock.get('symbol')
 
             yield item

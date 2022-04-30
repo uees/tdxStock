@@ -3,6 +3,7 @@ import json
 from urllib.parse import urlencode
 
 import scrapy
+from django.conf import settings
 
 from basedata.models import Stock
 from collector.items import ReportItem
@@ -24,7 +25,7 @@ class ReportSpider(scrapy.Spider):
         self.quarter = quarter
         self.report = report
         self.crawl_mode = crawl_mode  # all or append, 全量或追加
-        self.start_year = getattr(self, 'start_year', None)
+        self.start_year = getattr(self, 'start_year', settings.env("START_YEAR"))
         self.end_year = getattr(self, 'end_year', None)
 
         # 单季参数  S0 S1 S2 S3 S4
@@ -60,11 +61,10 @@ class ReportSpider(scrapy.Spider):
 
         # stocks = qs.filter(reports_num__lte=4).all()
 
+        unixtime = ''
         if self.end_year:
             # 因为是按时间逆序排列，获取全年数据需要使用 quarter=4
             unixtime = timestamp(get_quarter_date(year=int(self.end_year), quarter=4)) + 1
-        else:
-            unixtime = ''
 
         stocks = Stock.objects.all()
 

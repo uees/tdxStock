@@ -9,6 +9,7 @@ import scrapy
 class StockItem(scrapy.Item):
     """股票"""
     name = scrapy.Field()
+    pinyin = scrapy.Field()
     code = scrapy.Field()
     exchange_code = scrapy.Field()
     company_name = scrapy.Field()

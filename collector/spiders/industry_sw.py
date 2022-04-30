@@ -3,7 +3,6 @@ import time
 from urllib.parse import urlencode
 
 import scrapy
-from selenium import webdriver
 
 from basedata.models import Industry
 from collector.utils import get_params, timestamp

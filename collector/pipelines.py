@@ -12,27 +12,27 @@ class StockPipeline(object):
     """下载股票到数据库"""
 
     def __init__(self):
-        self.codes = {}
+        self.stock_map = {}
         for stock in Stock.objects.only('code', 'name').all():
-            self.codes[stock.code] = stock.name
+            self.stock_map[stock.code] = stock.name
 
     def process_item(self, item, spider):
         if spider.name == "stock_list":
-            if item['code'] in self.codes:
-                if item['name'] == self.codes[item['code']]:
+            if item['code'] in self.stock_map:
+                if item['name'] == self.stock_map[item['code']]:
                     # 去重
                     raise DropItem("Duplicate item found: %s" % item)
 
                 # else 要更新
-                self.codes.update({item['code']: item['name']})
+                self.stock_map.update({item['code']: item['name']})
 
                 def update_stock():
-                    Stock.objects.filter(code=item['code']).update(name=item['name'])
+                    Stock.objects.filter(code=item['code']).update(name=item['name'], pinyin=item["pinyin"])
 
                 reactor.callInThread(update_stock)
             else:
                 # 新增的
-                self.codes.update({item['code']: item['name']})
+                self.stock_map.update({item['code']: item['name']})
 
                 def create_stock():
                     Stock.objects.create(**dict(item))
